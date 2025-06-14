@@ -1,6 +1,6 @@
 import { Navigate, type RouteObject } from 'react-router';
 import { LoginDetailsConfirmationView } from './views/LoginDetailsConfirmationView/LoginDetailsConfirmationView';
-import { LoginDetailsView } from './views/LoginDetailsView/LoginDetailsView1';
+import { LoginDetailsView } from './views/LoginDetailsView/LoginDetailsView';
 
 export const routes = [
   {
