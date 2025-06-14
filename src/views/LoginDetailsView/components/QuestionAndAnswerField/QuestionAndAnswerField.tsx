@@ -3,6 +3,7 @@ import { Input } from '../../../../components/Input/Input';
 import { Select } from '../../../../components/Select/Select';
 import {
   getAnswerId,
+  getAnswerLabel,
   getQuestionId,
   getQuestionLabel,
 } from './QuestionAndAnswerField.helpers';
@@ -13,7 +14,7 @@ export const QuestionAndAnswerField: React.FC<QuestionAndAnswerFieldProps> = ({
   questionIndex,
 }) => {
   return (
-    <fieldset>
+    <li className="mt-5">
       <FormField
         label={getQuestionLabel(questionIndex)}
         name={getQuestionId(name, questionIndex)}
@@ -24,12 +25,12 @@ export const QuestionAndAnswerField: React.FC<QuestionAndAnswerFieldProps> = ({
           name={getQuestionId(name, questionIndex)}
         />
       </FormField>
-      <FormField label="Answer" name={getAnswerId(name, questionIndex)}>
+      <FormField label={getAnswerLabel(questionIndex)} name={getAnswerId(name, questionIndex)} className='mt-5'>
         <Input
           id={getAnswerId(name, questionIndex)}
           name={getAnswerId(name, questionIndex)}
         />
       </FormField>
-    </fieldset>
+    </li>
   );
 };

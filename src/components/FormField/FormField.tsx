@@ -1,6 +1,9 @@
 import { Label } from '../Label/Label';
 import { formFieldDescriptionDefaultProps } from './FormField.config';
-import { getFormFieldDescriptionId } from './FormField.helpers';
+import {
+  getFormFieldDescriptionId,
+  getFormFieldLabelId,
+} from './FormField.helpers';
 
 type FormFieldProps = React.JSX.IntrinsicElements['div'] & {
   label: React.ReactNode;
@@ -18,7 +21,9 @@ export const FormField: React.FC<FormFieldProps> = ({
 }) => {
   return (
     <div {...props}>
-      <Label htmlFor={name}>{label}</Label>
+      <Label htmlFor={name} id={getFormFieldLabelId(name)}>
+        {label}
+      </Label>
       {description ? (
         <p
           id={getFormFieldDescriptionId(name)}

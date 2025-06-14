@@ -6,7 +6,7 @@ import { SecurityQuestionsField } from './components/SecurityQuestionsField/Secu
 
 export const LoginDetailsView: React.FC = () => {
   return (
-    <div className="px-4 py-6">
+    <div className="px-4 pt-6 pb-8">
       <PageHeading title="Create your login details">
         <p className="text-gray-900">
           You'll need these to log in to the website or app, unless you use face
@@ -17,7 +17,7 @@ export const LoginDetailsView: React.FC = () => {
         <PasswordField />
         <SecureNumberField />
         <SecurityQuestionsField />
-        <Button type="submit" className="w-full mt-4">Continue</Button>
+        <Button type="submit" className="w-full mt-8">Continue</Button>
       </form>
     </div>
   );
