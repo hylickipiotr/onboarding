@@ -1,7 +1,9 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import type { LoginDetailsFormValues } from '../../../src/views/LoginDetailsView/components/FormContainer/FormContainer';
 import { LoginDetailsView } from '../../../src/views/LoginDetailsView/LoginDetailsView';
-import { renderElement } from '../utils/render';
+import { assertAppContextValue } from '../utils/asserts';
+import { renderWithRouter } from '../utils/renderWithRouter';
 
 const SECURE_NUMBER_DIGITS_COUNT = 6;
 const SECURITY_QUESTIONS_COUNT = 3;
@@ -29,7 +31,7 @@ describe('LoginDetailsView', () => {
     } satisfies LoginDetailsFormValues;
 
     // When a component is rendered
-    renderElement(<LoginDetailsView loginDetails={loginDetails} />);
+    renderWithRouter(<LoginDetailsView loginDetails={loginDetails} />);
 
     // Then it should render page heading
     expect(
@@ -115,6 +117,123 @@ describe('LoginDetailsView', () => {
     expect(continueButton).toBeInTheDocument();
     expect(continueButton).toHaveAttribute('type', 'submit');
     expect(continueButton).toBeEnabled();
+  });
+
+  it('should navigate to confirmation page', async () => {
+    // Given a login details
+    const loginDetails = {
+      password: 'password',
+      securityNumbers: ['1', '2', '3', '4', '5', '6'],
+      securityQuestions: [
+        {
+          question: 'maiden-name',
+          answer: 'Maria',
+        },
+        {
+          question: 'city-of-birth',
+          answer: 'Warsaw',
+        },
+        {
+          question: 'first-pet-name',
+          answer: 'Max',
+        },
+      ],
+    } satisfies LoginDetailsFormValues;
+
+    // And a rendered component
+    const { location } = renderWithRouter(
+      <LoginDetailsView loginDetails={loginDetails} />,
+      {
+        dashboardPath: '/login-details/confirmation',
+      }
+    );
+
+    // When clicking continue button
+    const continueButton = screen.getByRole('button', {
+      name: 'Continue',
+    });
+    await userEvent.click(continueButton);
+
+    // Then it should navigate to confirmation page
+    await waitFor(() =>
+      expect(location.pathname).toBe('/login-details/confirmation')
+    );
+
+    // And it should have two history entries
+    expect(history.length).toBe(2);
+  });
+
+  it('should set login details in app context', async () => {
+    // Given a login details
+    const loginDetails = {
+      password: 'password',
+      securityNumbers: ['1', '2', '3', '4', '5', '6'],
+      securityQuestions: [
+        {
+          question: 'maiden-name',
+          answer: 'Maria',
+        },
+        {
+          question: 'city-of-birth',
+          answer: 'Warsaw',
+        },
+        {
+          question: 'first-pet-name',
+          answer: 'Max',
+        },
+      ],
+    } satisfies LoginDetailsFormValues;
+
+    // And a rendered component
+    const { location } = renderWithRouter(
+      <LoginDetailsView loginDetails={loginDetails} />,
+      {
+        dashboardPath: '/login-details/confirmation',
+      }
+    );
+
+    // When clicking continue button
+    const continueButton = screen.getByRole('button', {
+      name: 'Continue',
+    });
+    await userEvent.click(continueButton);
+
+    // Then it should navigate to confirmation page
+    expect(location.pathname).toBe('/login-details/confirmation');
+
+    // And it should have two history entries
+    expect(history.length).toBe(2);
+
+    // And it should set login details in app context
+    assertAppContextValue('loginDetails.password', loginDetails.password);
+    assertAppContextValue(
+      'loginDetails.securityNumber',
+      loginDetails.securityNumbers.join('')
+    );
+    assertAppContextValue(
+      'loginDetails.securityQuestions.0.question',
+      loginDetails.securityQuestions[0].question
+    );
+    assertAppContextValue(
+      'loginDetails.securityQuestions.0.answer',
+      loginDetails.securityQuestions[0].answer
+    );
+    assertAppContextValue(
+      'loginDetails.securityQuestions.1.question',
+      loginDetails.securityQuestions[1].question
+    );
+    assertAppContextValue(
+      'loginDetails.securityQuestions.1.answer',
+      loginDetails.securityQuestions[1].answer
+    );
+    assertAppContextValue(
+      'loginDetails.securityQuestions.2.question',
+      loginDetails.securityQuestions[2].question
+    );
+    assertAppContextValue(
+      'loginDetails.securityQuestions.2.answer',
+      loginDetails.securityQuestions[2].answer
+    );
   });
 
   describe.skip('Password field', () => {});
