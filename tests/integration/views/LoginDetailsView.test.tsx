@@ -8,8 +8,8 @@ const SECURITY_QUESTIONS_COUNT = 3;
 
 describe('LoginDetailsView', () => {
   it('should render correctly', () => {
-    // Given a default values
-    const defaultValues = {
+    // Given a login details
+    const loginDetails = {
       password: 'password',
       securityNumbers: ['1', '2', '3', '4', '5', '6'],
       securityQuestions: [
@@ -29,7 +29,7 @@ describe('LoginDetailsView', () => {
     } satisfies LoginDetailsFormValues;
 
     // When a component is rendered
-    renderElement(<LoginDetailsView defaultValues={defaultValues} />);
+    renderElement(<LoginDetailsView loginDetails={loginDetails} />);
 
     // Then it should render page heading
     expect(
@@ -78,7 +78,7 @@ describe('LoginDetailsView', () => {
       });
       expect(digitTextbox).toBeInTheDocument();
       expect(digitTextbox).toBeEnabled();
-      expect(digitTextbox).toHaveValue(defaultValues.securityNumbers[index]);
+      expect(digitTextbox).toHaveValue(loginDetails.securityNumbers[index]);
     });
 
     // And it should render security question field
@@ -95,7 +95,7 @@ describe('LoginDetailsView', () => {
       expect(questionElement).toBeInTheDocument();
       expect(questionElement).toBeEnabled();
       expect(questionElement).toHaveValue(
-        defaultValues.securityQuestions[index].question
+        loginDetails.securityQuestions[index].question
       );
 
       const answerElement = screen.getByRole('textbox', {
@@ -104,7 +104,7 @@ describe('LoginDetailsView', () => {
       expect(answerElement).toBeInTheDocument();
       expect(answerElement).toBeEnabled();
       expect(answerElement).toHaveValue(
-        defaultValues.securityQuestions[index].answer
+        loginDetails.securityQuestions[index].answer
       );
     });
 

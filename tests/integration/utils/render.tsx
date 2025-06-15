@@ -1,10 +1,12 @@
 import { render } from '@testing-library/react';
 import {
   createMemoryRouter,
+  Outlet,
   RouterProvider,
   useLocation,
   useNavigationType,
 } from 'react-router';
+import { AppContextProvider } from '../../../src/contexts/AppContext';
 
 export const renderElement = (element: React.ReactNode) => {
   let navigationTypeResult: string | null = null;
@@ -17,14 +19,27 @@ export const renderElement = (element: React.ReactNode) => {
     return <p>Next page</p>;
   };
 
+  const Wrapper = () => {
+    return (
+      <AppContextProvider>
+        <Outlet />
+      </AppContextProvider>
+    );
+  };
+
   const router = createMemoryRouter([
     {
-      path: '/',
-      element,
-    },
-    {
-      path: '*',
-      element: <NextPage />,
+      element: <Wrapper />,
+      children: [
+        {
+          path: '/',
+          element,
+        },
+        {
+          path: '*',
+          element: <NextPage />,
+        },
+      ],
     },
   ]);
 

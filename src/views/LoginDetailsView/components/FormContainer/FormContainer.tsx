@@ -3,6 +3,7 @@ import type React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
+import { useLoginDetails } from '../../../../contexts/AppContext';
 
 type FormContainerProps = Omit<
   React.JSX.IntrinsicElements['form'],
@@ -39,10 +40,14 @@ export const FormContainer: React.FC<
     resolver: zodResolver(LoginDetailsFormSchema),
     mode: 'onBlur',
   });
+  const { setLoginDetails } = useLoginDetails();
 
   const onSubmit = (data: LoginDetailsFormValues) => {
-    console.log(data);
-    // TODO: save data in app context
+    setLoginDetails({
+      password: data.password,
+      securityNumber: data.securityNumbers.join(''),
+      securityQuestions: data.securityQuestions,
+    });
     navigate('/login-details/confirmation');
   };
 
