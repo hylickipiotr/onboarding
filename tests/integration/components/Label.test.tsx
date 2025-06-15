@@ -15,6 +15,6 @@ describe('Label', () => {
 
     // And it should have the default props
     expect(label).toHaveAttribute('for', 'label');
-    expect(label).toHaveClass('text-gray-900');
+    expect(label).toHaveClass('text-gray-700');
   });
 });

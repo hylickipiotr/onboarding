@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { render, screen } from '@testing-library/react';
-import { Select } from '../../../src/components/Select/Select';
 import userEvent from '@testing-library/user-event';
+import { Select } from '../../../src/components/Select/Select';
 
 describe('Select', () => {
   it('should render correctly', () => {
@@ -24,12 +24,6 @@ describe('Select', () => {
     expect(select).toHaveValue('');
     expect(select).toHaveDisplayValue(placeholder);
     expect(select).toHaveClass('text-gray-900');
-
-    // And it should render a placeholder option
-    const placeholderOption = screen.getByRole('option', { name: placeholder });
-    expect(placeholderOption).toBeInTheDocument();
-    expect(placeholderOption).toHaveAttribute('value', '');
-    expect(placeholderOption).toHaveAttribute('disabled');
   });
 
   it('should render with custom props', () => {
@@ -104,13 +98,11 @@ describe('Select', () => {
 
     // And it should render the options
     const optionsElements = screen.getAllByRole('option');
-    expect(optionsElements).toHaveLength(3);
-    expect(optionsElements[0]).toHaveTextContent(placeholder);
-    expect(optionsElements[0]).toHaveValue('');
-    expect(optionsElements[1]).toHaveTextContent(options[0].label);
-    expect(optionsElements[1]).toHaveValue(options[0].value);
-    expect(optionsElements[2]).toHaveTextContent(options[1].label);
-    expect(optionsElements[2]).toHaveValue(options[1].value);
+    expect(optionsElements).toHaveLength(2);
+    expect(optionsElements[0]).toHaveTextContent(options[0].label);
+    expect(optionsElements[0]).toHaveValue(options[0].value);
+    expect(optionsElements[1]).toHaveTextContent(options[1].label);
+    expect(optionsElements[1]).toHaveValue(options[1].value);
   });
 
   it('should render with default value', () => {
@@ -133,6 +125,28 @@ describe('Select', () => {
     // Then it should have the default value
     const select = screen.getByRole('combobox');
     expect(select).toHaveValue(defaultValue);
+  });
+
+  it('should render with value', () => {
+    // Given a name
+    const name = faker.lorem.word();
+
+    // And a placeholder
+    const placeholder = faker.lorem.word();
+
+    // And a value
+    const value = faker.lorem.word();
+
+    // When a component is rendered
+    render(
+      <Select name={name} placeholder={placeholder} value={value}>
+        <option value={value}>{value}</option>
+      </Select>
+    );
+
+    // Then it should have the correct value
+    const select = screen.getByRole('combobox');
+    expect(select).toHaveValue(value);
   });
 
   it('should handle change events', async () => {

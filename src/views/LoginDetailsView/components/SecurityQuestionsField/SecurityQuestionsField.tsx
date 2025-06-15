@@ -1,9 +1,12 @@
-import { formFieldDescriptionDefaultProps } from '../../../../components/FormField/FormField.config';
+import { twMerge } from 'tailwind-merge';
 import {
   getFormFieldDescriptionId,
   getFormFieldLabelId,
 } from '../../../../components/FormField/FormField.helpers';
-import { labelDefaultProps } from '../../../../components/Label/Label.config';
+import {
+  formFieldDescriptionClassName,
+  formFieldLabelClassName,
+} from '../../../../components/FormField/FormField.styles';
 import { QuestionAndAnswerField } from '../QuestionAndAnswerField/QuestionAndAnswerField';
 
 export const SecurityQuestionsField: React.FC = () => {
@@ -17,20 +20,20 @@ export const SecurityQuestionsField: React.FC = () => {
     >
       <legend
         id={getFormFieldLabelId('securityQuestions')}
-        className={labelDefaultProps.className}
+        className={twMerge(formFieldLabelClassName({ description: true }))}
       >
         Security questions
       </legend>
       <p
         id={getFormFieldDescriptionId('securityQuestions')}
-        className={formFieldDescriptionDefaultProps.className}
+        className={formFieldDescriptionClassName}
       >
         We'll only ask you these if you forget your password.
       </p>
       <ul>
-        <QuestionAndAnswerField name="securityQuestions" questionIndex={0} />
-        <QuestionAndAnswerField name="securityQuestions" questionIndex={1} />
-        <QuestionAndAnswerField name="securityQuestions" questionIndex={2} />
+        <QuestionAndAnswerField questionIndex={0} />
+        <QuestionAndAnswerField questionIndex={1} />
+        <QuestionAndAnswerField questionIndex={2} />
       </ul>
     </fieldset>
   );

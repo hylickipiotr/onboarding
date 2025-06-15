@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useController } from 'react-hook-form';
 import { FormField } from '../../../../components/FormField/FormField';
 import { Input } from '../../../../components/Input/Input';
+import type { LoginDetailsFormValues } from '../FormContainer/FormContainer';
 import { PasswordRequirement } from './PasswordRequirement';
 
 const passwordChecks = [
@@ -23,7 +24,12 @@ const passwordChecks = [
 ] as const;
 
 export const PasswordField: React.FC = () => {
-  const [password, setPassword] = useState('');
+  const { field, fieldState } = useController<
+    Pick<LoginDetailsFormValues, 'password'>
+  >({
+    name: 'password',
+  });
+
   return (
     <FormField
       className="mt-5"
@@ -35,10 +41,9 @@ export const PasswordField: React.FC = () => {
         data-testid="password"
         type="password"
         id="password"
-        name="password"
         aria-describedby="password-description"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        error={!!fieldState.error}
+        {...field}
       />
       <ul
         className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-500"
@@ -48,7 +53,8 @@ export const PasswordField: React.FC = () => {
           <PasswordRequirement
             key={check.label}
             label={check.label}
-            valid={check.validate(password)}
+            valid={check.validate(field.value)}
+            error={!!fieldState.error}
           />
         ))}
       </ul>

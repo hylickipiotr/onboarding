@@ -1,6 +1,12 @@
+import type { VariantProps } from 'class-variance-authority';
 import { twMerge } from 'tailwind-merge';
-import { selectDefaultProps } from './Select.config';
-import type { SelectProps } from './Select.types';
+import { selectClassName } from './Select.styles';
+
+export type SelectProps = React.JSX.IntrinsicElements['select'] &
+  VariantProps<typeof selectClassName> & {
+    placeholder: string;
+    name: string;
+  };
 
 export const Select: React.FC<SelectProps> = ({
   children,
@@ -8,17 +14,21 @@ export const Select: React.FC<SelectProps> = ({
   id,
   placeholder,
   className,
+  error,
+  value,
+  defaultValue,
   ...props
 }) => {
   return (
     <select
-      {...selectDefaultProps}
       name={name}
       id={id ?? name}
-      className={twMerge(selectDefaultProps.className, className)}
+      className={twMerge(selectClassName({ error }), className)}
+      value={value}
+      defaultValue={value === undefined ? defaultValue ?? '' : undefined}
       {...props}
     >
-      <option value="" disabled>
+      <option value="" disabled hidden>
         {placeholder}
       </option>
       {children}

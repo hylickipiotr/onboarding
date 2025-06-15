@@ -1,13 +1,35 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import type { LoginDetailsFormValues } from '../../../src/views/LoginDetailsView/components/FormContainer/FormContainer';
 import { LoginDetailsView } from '../../../src/views/LoginDetailsView/LoginDetailsView';
+import { renderElement } from '../utils/render';
 
 const SECURE_NUMBER_DIGITS_COUNT = 6;
 const SECURITY_QUESTIONS_COUNT = 3;
 
 describe('LoginDetailsView', () => {
   it('should render correctly', () => {
+    // Given a default values
+    const defaultValues = {
+      password: 'password',
+      securityNumbers: ['1', '2', '3', '4', '5', '6'],
+      securityQuestions: [
+        {
+          question: 'maiden-name',
+          answer: 'Maria',
+        },
+        {
+          question: 'city-of-birth',
+          answer: 'Warsaw',
+        },
+        {
+          question: 'first-pet-name',
+          answer: 'Max',
+        },
+      ],
+    } satisfies LoginDetailsFormValues;
+
     // When a component is rendered
-    render(<LoginDetailsView />);
+    renderElement(<LoginDetailsView defaultValues={defaultValues} />);
 
     // Then it should render page heading
     expect(
@@ -24,17 +46,17 @@ describe('LoginDetailsView', () => {
       )
     ).toBeInTheDocument();
 
+    // And it should render password label
+    const passwordLabel = screen.getByText('Password');
+    expect(passwordLabel).toBeInTheDocument();
+    expect(passwordLabel).toHaveAttribute('for', 'password');
+
     // And it should render password field
     const passwordTextbox = screen.getByTestId('password');
     expect(passwordTextbox).toBeInTheDocument();
     expect(passwordTextbox).toBeEnabled();
     expect(passwordTextbox).toHaveAttribute('type', 'password');
-    expect(passwordTextbox).toHaveTextContent('');
-
-    // And it should render password label
-    const passwordLabel = screen.getByText('Password');
-    expect(passwordLabel).toBeInTheDocument();
-    expect(passwordLabel).toHaveAttribute('for', 'password');
+    expect(passwordTextbox).toHaveValue('password');
 
     // And it should render password description
     const passwordDescription = screen.getByText(
@@ -56,7 +78,7 @@ describe('LoginDetailsView', () => {
       });
       expect(digitTextbox).toBeInTheDocument();
       expect(digitTextbox).toBeEnabled();
-      expect(digitTextbox).toHaveTextContent('');
+      expect(digitTextbox).toHaveValue(defaultValues.securityNumbers[index]);
     });
 
     // And it should render security question field
@@ -72,14 +94,18 @@ describe('LoginDetailsView', () => {
       });
       expect(questionElement).toBeInTheDocument();
       expect(questionElement).toBeEnabled();
-      expect(questionElement).toHaveTextContent(`Select a question`);
+      expect(questionElement).toHaveValue(
+        defaultValues.securityQuestions[index].question
+      );
 
       const answerElement = screen.getByRole('textbox', {
         name: `Answer ${index + 1}`,
       });
       expect(answerElement).toBeInTheDocument();
       expect(answerElement).toBeEnabled();
-      expect(answerElement).toHaveTextContent('');
+      expect(answerElement).toHaveValue(
+        defaultValues.securityQuestions[index].answer
+      );
     });
 
     // And it should render continue button

@@ -1,6 +1,10 @@
 import { twMerge } from 'tailwind-merge';
-import { labelDefaultProps } from './Label.config';
-import type { LabelProps } from './Label.types';
+import { labelClassName } from './Label.styles';
+
+export type LabelProps = React.JSX.IntrinsicElements['label'] & {
+  htmlFor: string;
+  children: React.ReactNode;
+};
 
 export const Label: React.FC<LabelProps> = ({
   children,
@@ -8,11 +12,7 @@ export const Label: React.FC<LabelProps> = ({
   ...props
 }) => {
   return (
-    <label
-      {...labelDefaultProps}
-      className={twMerge(labelDefaultProps.className, className)}
-      {...props}
-    >
+    <label className={twMerge(labelClassName, className)} {...props}>
       {children}
     </label>
   );

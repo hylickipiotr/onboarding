@@ -1,19 +1,27 @@
+import { type VariantProps } from 'class-variance-authority';
 import { twMerge } from 'tailwind-merge';
-import { inputDefaultProps } from './Input.config';
-import type { InputProps } from './Input.types';
+import { inputClassName } from './Input.styles';
+
+type InputProps = React.JSX.IntrinsicElements['input'] &
+  VariantProps<typeof inputClassName> & {
+    name: string;
+  };
 
 export const Input: React.FC<InputProps> = ({
-  name,
-  id,
+  ref,
   className,
+  id,
+  name,
+  error,
   ...props
 }) => {
   return (
     <input
-      {...inputDefaultProps}
+      ref={ref}
+      type="text"
       name={name}
       id={id ?? name}
-      className={twMerge(inputDefaultProps.className, className)}
+      className={twMerge(inputClassName({ error }), className)}
       {...props}
     />
   );

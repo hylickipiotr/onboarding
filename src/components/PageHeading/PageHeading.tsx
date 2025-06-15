@@ -1,4 +1,6 @@
-import type { PageHeadingProps } from './PageHeading.types';
+type PageHeadingProps = {
+  title: string;
+};
 
 export const PageHeading: React.FC<
   React.PropsWithChildren<PageHeadingProps>

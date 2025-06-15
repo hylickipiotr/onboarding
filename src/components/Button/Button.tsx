@@ -1,6 +1,9 @@
 import { twMerge } from 'tailwind-merge';
-import { buttonDefaultProps } from './Button.config';
-import type { ButtonProps } from './Button.types';
+import { buttonClassName } from './Button.styles';
+
+type ButtonProps = React.JSX.IntrinsicElements['button'] & {
+  children: React.ReactNode;
+};
 
 export const Button: React.FC<ButtonProps> = ({
   children,
@@ -9,9 +12,9 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   return (
     <button
-      {...buttonDefaultProps}
+      type="button"
+      className={twMerge(buttonClassName, className)}
       {...props}
-      className={twMerge(buttonDefaultProps.className, className)}
     >
       {children}
     </button>
