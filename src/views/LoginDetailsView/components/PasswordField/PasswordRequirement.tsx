@@ -2,7 +2,7 @@ import { IconCheck, IconPointFilled } from '@tabler/icons-react';
 import type React from 'react';
 
 type PasswordRequirementProps = {
-  label: React.ReactNode;
+  label: string;
   valid: boolean;
   error: boolean;
 };
@@ -12,16 +12,29 @@ export const PasswordRequirement: React.FC<PasswordRequirementProps> = ({
   valid,
   error,
 }) => {
-  const checked = valid ? 'true' : 'false';
+  const showError = !valid && error;
+
   const validIcon = <IconCheck size={20} className="text-emerald-600" />;
-  const invalidIcon = <IconPointFilled size={10} />;
+  const invalidIcon = (
+    <IconPointFilled
+      className={showError ? 'text-red-600' : 'text-gray-500'}
+      size={10}
+    />
+  );
 
   return (
-    <li aria-checked={checked} className="flex items-center ">
-      <span className="flex justify-center items-center w-5 h-5 ">
+    <li
+      className="flex items-center"
+      aria-label={`Requirement ${valid ? 'met' : 'not met'}: ${label}`}
+    >
+      <div className="flex justify-center items-center w-5 h-5 ">
         {valid ? validIcon : invalidIcon}
-      </span>
-      <span data-error={error} className="ml-1 data-[error=true]:text-red-600">
+      </div>
+      <span
+        className={`ml-1 text-sm ${
+          showError ? 'text-red-600' : 'text-gray-500'
+        }`}
+      >
         {label}
       </span>
     </li>

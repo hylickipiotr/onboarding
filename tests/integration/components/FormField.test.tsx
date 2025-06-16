@@ -51,4 +51,31 @@ describe('FormField', () => {
     expect(descriptionElement).toBeInTheDocument();
     expect(descriptionElement).toHaveAttribute('id', descriptionId);
   });
+
+  it('should render error', () => {
+    // Given a label
+    const label = faker.lorem.sentence();
+
+    // And a name
+    const name = faker.lorem.word();
+
+    // And an error
+    const error = faker.lorem.sentence();
+
+    // When a component with children is rendered
+    render(
+      <FormField label={label} name={name} error={error}>
+        <input type="text" id={name} />
+      </FormField>
+    );
+
+    // Then it should render correctly
+    const formField = screen.getByRole('textbox', { name: label });
+    expect(formField).toBeInTheDocument();
+
+    // And it should render an error
+    const errorElement = screen.getByText(error);
+    expect(errorElement).toBeInTheDocument();
+    expect(errorElement).toHaveClass('text-red-600');
+  });
 });

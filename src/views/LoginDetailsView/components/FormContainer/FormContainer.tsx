@@ -13,7 +13,20 @@ type FormContainerProps = Omit<
 };
 
 const LoginDetailsFormSchema = z.object({
-  password: z.string().min(8),
+  password: z
+    .string()
+    .min(8, {
+      message: 'At least 8 characters',
+    })
+    .refine((val) => /[a-z]/.test(val), {
+      message: '1 lowercase letter',
+    })
+    .refine((val) => /[A-Z]/.test(val), {
+      message: '1 uppercase letter',
+    })
+    .refine((val) => /[0-9]/.test(val), {
+      message: '1 number',
+    }),
   securityNumbers: z
     .array(z.string().regex(/^[0-9a-zA-Z]$/, 'Invalid character'))
     .length(6, 'Security number must have 6 digits')

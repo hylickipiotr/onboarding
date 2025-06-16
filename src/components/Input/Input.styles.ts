@@ -5,7 +5,7 @@ export const inputBaseClassName =
 export const inputClassName = cva(inputBaseClassName, {
   variants: {
     error: {
-      true: 'border-red-500 text-red-600 focus:border-red-500 focus:ring-red-200',
+      true: 'border-red-500 text-red-600 focus:border-red-500 focus:ring-red-200 hover:border-red-500',
       false: 'border-gray-300 text-gray-900',
     },
   },

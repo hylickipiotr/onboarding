@@ -46,7 +46,7 @@ export const PasswordField: React.FC = () => {
         {...field}
       />
       <ul
-        className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-500"
+        className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2"
         aria-live="polite"
       >
         {passwordChecks.map((check) => (

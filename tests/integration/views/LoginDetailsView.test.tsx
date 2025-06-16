@@ -1,5 +1,7 @@
+import { faker } from '@faker-js/faker';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import * as factory from 'factory.ts';
 import type { LoginDetailsFormValues } from '../../../src/views/LoginDetailsView/components/FormContainer/FormContainer';
 import { LoginDetailsView } from '../../../src/views/LoginDetailsView/LoginDetailsView';
 import { assertAppContextValue } from '../utils/asserts';
@@ -11,24 +13,7 @@ const SECURITY_QUESTIONS_COUNT = 3;
 describe('LoginDetailsView', () => {
   it('should render correctly', () => {
     // Given a login details
-    const loginDetails = {
-      password: 'password',
-      securityNumbers: ['1', '2', '3', '4', '5', '6'],
-      securityQuestions: [
-        {
-          question: 'maiden-name',
-          answer: 'Maria',
-        },
-        {
-          question: 'city-of-birth',
-          answer: 'Warsaw',
-        },
-        {
-          question: 'first-pet-name',
-          answer: 'Max',
-        },
-      ],
-    } satisfies LoginDetailsFormValues;
+    const loginDetails = loginDetailsFactory.build();
 
     // When a component is rendered
     renderWithRouter(<LoginDetailsView loginDetails={loginDetails} />);
@@ -58,7 +43,7 @@ describe('LoginDetailsView', () => {
     expect(passwordTextbox).toBeInTheDocument();
     expect(passwordTextbox).toBeEnabled();
     expect(passwordTextbox).toHaveAttribute('type', 'password');
-    expect(passwordTextbox).toHaveValue('password');
+    expect(passwordTextbox).toHaveValue(loginDetails.password);
 
     // And it should render password description
     const passwordDescription = screen.getByText(
@@ -119,26 +104,9 @@ describe('LoginDetailsView', () => {
     expect(continueButton).toBeEnabled();
   });
 
-  it('should navigate to confirmation page', async () => {
+  it('should navigate to confirmation page after clicking continue button', async () => {
     // Given a login details
-    const loginDetails = {
-      password: 'password',
-      securityNumbers: ['1', '2', '3', '4', '5', '6'],
-      securityQuestions: [
-        {
-          question: 'maiden-name',
-          answer: 'Maria',
-        },
-        {
-          question: 'city-of-birth',
-          answer: 'Warsaw',
-        },
-        {
-          question: 'first-pet-name',
-          answer: 'Max',
-        },
-      ],
-    } satisfies LoginDetailsFormValues;
+    const loginDetails = loginDetailsFactory.build();
 
     // And a rendered component
     const { history } = renderWithRouter(
@@ -163,26 +131,9 @@ describe('LoginDetailsView', () => {
     expect(history.index).toBe(1);
   });
 
-  it('should set login details in app context', async () => {
+  it('should set login details in app context after clicking continue button', async () => {
     // Given a login details
-    const loginDetails = {
-      password: 'password',
-      securityNumbers: ['1', '2', '3', '4', '5', '6'],
-      securityQuestions: [
-        {
-          question: 'maiden-name',
-          answer: 'Maria',
-        },
-        {
-          question: 'city-of-birth',
-          answer: 'Warsaw',
-        },
-        {
-          question: 'first-pet-name',
-          answer: 'Max',
-        },
-      ],
-    } satisfies LoginDetailsFormValues;
+    const loginDetails = loginDetailsFactory.build();
 
     // And a rendered component
     const { history } = renderWithRouter(
@@ -238,25 +189,281 @@ describe('LoginDetailsView', () => {
     );
   });
 
-  describe.skip('Password field', () => {});
+  describe('Password field', () => {
+    it('should met the length requirement', async () => {
+      // Given a string with at least 8 characters
+      const password = faker.string.alpha({
+        length: faker.number.int({ min: 8, max: 100 }),
+      });
 
-  describe.skip('Secure number field', () => {
-    it.skip('should allow to focus only on first digit when field is empty');
-    it.skip('should allow to focus on each digit when field is filled');
-    it.skip('should allow to enter only one digit to each field');
-    it.skip('should focus on next digit field when enter the digit');
-    it.skip(
-      'should stay focused on last digit field when enter the last digit'
-    );
-    it.skip('should focus on previous digit field when backspace the digit');
-    it.skip(
-      'should stay focused on first digit field when backspace the first digit'
-    );
-    it.skip('should allow to paste the single digit to each field');
-    it.skip(
-      'should fill the digits when focus first digit field and paste exactly 6 digits'
-    );
+      // And a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // And a requirement not met the password
+      const notMetLengthRequirement = screen.getByRole('listitem', {
+        name: /Requirement not met: At least 8 characters/i,
+      });
+      expect(notMetLengthRequirement).toBeInTheDocument();
+
+      // And it should have a valid icon
+      const notMetIcon = notMetLengthRequirement.querySelector('svg');
+      expect(notMetIcon).toHaveClass('tabler-icon-point-filled');
+      expect(notMetIcon).not.toHaveClass('text-red-600');
+
+      // When typing password with
+      await userEvent.type(screen.getByTestId('password'), password);
+
+      // Then not met requirement should be removed
+      expect(
+        screen.queryByRole('listitem', {
+          name: /Requirement not met: At least 8 characters/i,
+        })
+      ).not.toBeInTheDocument();
+
+      // And requirement met the password
+      const metLengthRequirement = screen.getByRole('listitem', {
+        name: /Requirement met: At least 8 characters/i,
+      });
+
+      // And it should have a valid icon
+      const icon = metLengthRequirement.querySelector('svg');
+      expect(icon).toHaveClass('tabler-icon-check');
+      expect(icon).toHaveClass('text-emerald-600');
+    });
+
+    it('should met the lowercase letter requirement', async () => {
+      // Given a string with at least 8 characters
+      const password = faker.string.alpha({
+        length: faker.number.int({ min: 1, max: 100 }),
+        casing: 'lower',
+      });
+
+      // And a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // When typing password with
+      await userEvent.type(screen.getByTestId('password'), password);
+
+      // Then it should met the lowercase letter requirement
+      const lowercaseRequirement = screen.getByRole('listitem', {
+        name: /Requirement met: 1 lowercase letter/i,
+      });
+      expect(lowercaseRequirement).toBeInTheDocument();
+
+      // And it should have a valid icon
+      const icon = lowercaseRequirement.querySelector('svg');
+      expect(icon).toHaveClass('tabler-icon-check');
+      expect(icon).toHaveClass('text-emerald-600');
+    });
+
+    it('should met the number requirement', async () => {
+      // Given a string with at least 8 characters
+      const password = faker.string.numeric({
+        length: faker.number.int({ min: 1, max: 100 }),
+      });
+
+      // And a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // When typing password with
+      await userEvent.type(screen.getByTestId('password'), password);
+
+      // Then it should met the number requirement
+      const numberRequirement = screen.getByRole('listitem', {
+        name: /Requirement met: 1 number/i,
+      });
+      expect(numberRequirement).toBeInTheDocument();
+
+      // And it should have a valid icon
+      const icon = numberRequirement.querySelector('svg');
+      expect(icon).toHaveClass('tabler-icon-check');
+      expect(icon).toHaveClass('text-emerald-600');
+    });
+
+    it('should met the uppercase letter requirement', async () => {
+      // Given a string with at least 8 characters
+      const password = faker.string.alpha({
+        length: faker.number.int({ min: 1, max: 100 }),
+        casing: 'upper',
+      });
+
+      // And a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // When typing password with
+      await userEvent.type(screen.getByTestId('password'), password);
+
+      // Then it should met the uppercase letter requirement
+      const uppercaseRequirement = screen.getByRole('listitem', {
+        name: /Requirement met: 1 uppercase letter/i,
+      });
+      expect(uppercaseRequirement).toBeInTheDocument();
+
+      // And it should have a valid icon
+      const icon = uppercaseRequirement.querySelector('svg');
+      expect(icon).toHaveClass('tabler-icon-check');
+      expect(icon).toHaveClass('text-emerald-600');
+    });
+
+    it('should met all requirements', async () => {
+      // Given a string with at least 8 characters
+      const password = faker.string.alphanumeric({
+        length: faker.number.int({ min: 8, max: 100 }),
+        casing: 'mixed',
+      });
+
+      // And a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // When typing password with
+      await userEvent.type(screen.getByTestId('password'), password);
+
+      // Then it should met all requirements
+      const requirements = screen.getAllByRole('listitem', {
+        name: /Requirement/i,
+      });
+      expect(requirements).toHaveLength(4);
+
+      requirements.forEach((requirement) => {
+        expect(requirement).toBeInTheDocument();
+        expect(requirement).toHaveAttribute('aria-label');
+        const icon = requirement.querySelector('svg');
+        expect(icon).toHaveClass('tabler-icon-check');
+        expect(icon).toHaveClass('text-emerald-600');
+      });
+    });
+
+    it('should change not met requirement text color when field has validation error', async () => {
+      // Given a string with 4 digits
+      const password = faker.string.numeric({
+        length: 4,
+      });
+
+      // And a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // When typing secure number with
+      await userEvent.type(screen.getByTestId('password'), password);
+
+      // And clicking on heading (to blur the field)
+      await userEvent.click(
+        screen.getByRole('heading', { name: /Create your login details/i })
+      );
+
+      // Then length requirement text should change color to red
+      const notMetLengthRequirement = screen.getByRole('listitem', {
+        name: /Requirement not met: At least 8 characters/i,
+      });
+      expect(notMetLengthRequirement.querySelector('span')).toHaveClass(
+        'text-red-600'
+      );
+
+      // And the icon should change the color to red
+      const notMetLengthRequirementIcon =
+        notMetLengthRequirement.querySelector('svg');
+      expect(notMetLengthRequirementIcon).toHaveClass(
+        'tabler-icon-point-filled'
+      );
+      expect(notMetLengthRequirementIcon).toHaveClass('text-red-600');
+
+      // And a number requirement text should not change color
+      const numberRequirement = screen.getByRole('listitem', {
+        name: /Requirement met: 1 number/i,
+      });
+      expect(numberRequirement.querySelector('span')).toHaveClass(
+        'text-gray-500'
+      );
+
+      // And the icon should change the color to green
+      const numberRequirementIcon = numberRequirement.querySelector('svg');
+      expect(numberRequirementIcon).toHaveClass('tabler-icon-check');
+      expect(numberRequirementIcon).toHaveClass('text-emerald-600');
+    });
+  });
+
+  describe('Secure number field', () => {
+    it('should focus on first digit when clicking on legend', async () => {
+      // Given a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // When clicking on legend
+      await userEvent.click(screen.getByText('Secure number'));
+
+      // Then it should focus on first digit
+      expect(
+        screen.getByRole('textbox', { name: 'Digit 1 of 6' })
+      ).toHaveFocus();
+    });
+
+    it('should allow to focus only on first digit when field is empty', async () => {
+      // Given a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // When clicking on second digit
+      await userEvent.click(
+        screen.getByRole('textbox', { name: 'Digit 2 of 6' })
+      );
+
+      // Then it should focus on second digit
+      expect(
+        screen.getByRole('textbox', { name: 'Digit 1 of 6' })
+      ).toHaveFocus();
+    });
+
+    it('should allow to focus on each digit when field is filled', async () => {
+      // Given a login details
+      const loginDetails = loginDetailsFactory.build();
+
+      // And a rendered component
+      renderWithRouter(<LoginDetailsView loginDetails={loginDetails} />);
+
+      // When clicking on second digit
+      await userEvent.click(
+        screen.getByRole('textbox', { name: 'Digit 2 of 6' })
+      );
+
+      // Then it should focus on second digit
+      expect(screen.getByRole('textbox', { name: 'Digit 2 of 6' }));
+    });
+    
+    it.skip('should allow to enter only one digit to each field', async () => {});
+    it.skip('should focus on next digit field when enter the digit', async () => {});
+    it.skip('should stay focused on last digit field when enter the last digit', async () => {});
+    it.skip('should focus on previous digit field when backspace the digit', async () => {});
+    it.skip('should stay focused on first digit field when backspace the first digit', async () => {});
+    it.skip('should allow to paste the single digit to each field', async () => {});
+    it.skip('should fill the digits when focus first digit field and paste exactly 6 digits', async () => {});
   });
 
   describe.skip('Security question fields', () => {});
+});
+
+const loginDetailsFactory = factory.Sync.makeFactory<LoginDetailsFormValues>({
+  password: factory.each(() =>
+    faker.string.alphanumeric({
+      length: faker.number.int({ min: 8, max: 100 }),
+      casing: 'mixed',
+    })
+  ),
+  securityNumbers: factory.each(() =>
+    Array.from({ length: SECURE_NUMBER_DIGITS_COUNT }).map(() =>
+      faker.string.numeric({
+        length: 1,
+      })
+    )
+  ),
+  securityQuestions: factory.each(() => [
+    {
+      question: 'maiden-name',
+      answer: faker.person.firstName(),
+    },
+    {
+      question: 'city-of-birth',
+      answer: faker.location.city(),
+    },
+    {
+      question: 'first-pet-name',
+      answer: faker.animal.dog(),
+    },
+  ]),
 });
