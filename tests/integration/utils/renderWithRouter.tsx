@@ -1,25 +1,67 @@
 import { render } from '@testing-library/react';
 import type React from 'react';
 import {
+  createRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import {
   createMemoryRouter,
   Outlet,
-  RouterProvider
+  RouterProvider,
+  useLocation,
 } from 'react-router';
 import { AppContextProvider } from '../../../src/contexts/AppContext';
 import { AppContextTestingDashboard } from './AppContextTestingDashboard';
 
 type ReactWithRouterOptions = {
   dashboardPath?: string;
+  initialEntries?: string[];
+  initialIndex?: number;
+};
+
+type History = {
+  getPathname: () => string;
+  getIndex: () => number;
 };
 
 export const renderWithRouter = (
   element: React.ReactNode,
-  { dashboardPath }: ReactWithRouterOptions = {}
+  {
+    dashboardPath,
+    initialEntries = ['/'],
+    initialIndex = 0,
+  }: ReactWithRouterOptions = {}
 ) => {
+  const LocationTracker: React.FC<{ ref: React.Ref<History> }> = ({
+    ref,
+  }) => {
+    const location = useLocation();
+    const indexRef = useRef(initialIndex);
+
+    const [pathname, setPathname] = useState(location.pathname);
+
+    useEffect(() => {
+      setPathname(location.pathname);
+      indexRef.current++;
+    }, [location.pathname]);
+
+    useImperativeHandle(ref, () => ({
+      getPathname: () => pathname,
+      getIndex: () => indexRef.current - 1,
+    }));
+
+    return null;
+  };
+
+  const trackerRef = createRef<History>();
 
   const Wrapper = () => {
     return (
       <AppContextProvider>
+        <LocationTracker ref={trackerRef} />
         <Outlet />
       </AppContextProvider>
     );
@@ -49,12 +91,21 @@ export const renderWithRouter = (
         ],
       },
     ],
-    { initialEntries: ['/'], initialIndex: 0 }
+    { initialEntries, initialIndex }
   );
 
   render(<RouterProvider router={router} />);
 
   return {
-    router,
+    history: {
+      location: {
+        get pathname() {
+          return trackerRef.current?.getPathname() ?? '';
+        },
+      },
+      get index() {
+        return trackerRef.current?.getIndex() ?? -1;
+      },
+    },
   };
 };

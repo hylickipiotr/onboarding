@@ -2,8 +2,8 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { LoginDetailsFormValues } from '../../../src/views/LoginDetailsView/components/FormContainer/FormContainer';
 import { LoginDetailsView } from '../../../src/views/LoginDetailsView/LoginDetailsView';
-import { renderWithRouter } from '../utils/renderWithRouter';
 import { assertAppContextValue } from '../utils/asserts';
+import { renderWithRouter } from '../utils/renderWithRouter';
 
 const SECURE_NUMBER_DIGITS_COUNT = 6;
 const SECURITY_QUESTIONS_COUNT = 3;
@@ -141,7 +141,7 @@ describe('LoginDetailsView', () => {
     } satisfies LoginDetailsFormValues;
 
     // And a rendered component
-    const { router } = renderWithRouter(
+    const { history } = renderWithRouter(
       <LoginDetailsView loginDetails={loginDetails} />,
       {
         dashboardPath: '/login-details/confirmation',
@@ -156,11 +156,11 @@ describe('LoginDetailsView', () => {
 
     // Then it should navigate to confirmation page
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/login-details/confirmation')
+      expect(history.location.pathname).toBe('/login-details/confirmation')
     );
 
     // And it should have PUSH history action
-    expect(router.state.historyAction).toBe('PUSH');
+    expect(history.index).toBe(1);
   });
 
   it('should set login details in app context', async () => {
@@ -185,7 +185,7 @@ describe('LoginDetailsView', () => {
     } satisfies LoginDetailsFormValues;
 
     // And a rendered component
-    const { router } = renderWithRouter(
+    const { history } = renderWithRouter(
       <LoginDetailsView loginDetails={loginDetails} />,
       {
         dashboardPath: '/login-details/confirmation',
@@ -199,11 +199,12 @@ describe('LoginDetailsView', () => {
     await userEvent.click(continueButton);
 
     // Then it should navigate to confirmation page
-    await waitFor(
-      () => expect(router.state.location.pathname).toBe('/login-details/confirmation'))
+    await waitFor(() =>
+      expect(history.location.pathname).toBe('/login-details/confirmation')
+    );
 
     // And it should have PUSH history action
-    expect(router.state.historyAction).toBe("PUSH");
+    expect(history.index).toBe(1);
 
     // And it should set login details in app context
     assertAppContextValue('loginDetails.password', loginDetails.password);
