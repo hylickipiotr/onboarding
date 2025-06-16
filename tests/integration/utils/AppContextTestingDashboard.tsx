@@ -5,22 +5,21 @@ export const AppContextTestingDashboard: React.FC = () => {
   return (
     <div>
       <div
-        data-testid="login-details.password"
+        data-testid="loginDetails.password"
         data-value={loginDetails?.password}
       />
       <div
-        data-testid="login-details.securityNumber"
+        data-testid="loginDetails.securityNumber"
         data-value={loginDetails?.securityNumber}
       />
       {loginDetails?.securityQuestions.map((securityQuestion, index) => (
         <div key={index}>
           <div
-            
-            data-testid={`login-details.securityQuestions.${index}.question`}
+            data-testid={`loginDetails.securityQuestions.${index}.question`}
             data-value={securityQuestion.question}
           />
           <div
-            data-testid={`login-details.securityQuestions.${index}.answer`}
+            data-testid={`loginDetails.securityQuestions.${index}.answer`}
             data-value={securityQuestion.answer}
           />
         </div>

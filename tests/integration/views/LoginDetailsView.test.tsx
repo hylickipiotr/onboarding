@@ -2,8 +2,8 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { LoginDetailsFormValues } from '../../../src/views/LoginDetailsView/components/FormContainer/FormContainer';
 import { LoginDetailsView } from '../../../src/views/LoginDetailsView/LoginDetailsView';
-import { assertAppContextValue } from '../utils/asserts';
 import { renderWithRouter } from '../utils/renderWithRouter';
+import { assertAppContextValue } from '../utils/asserts';
 
 const SECURE_NUMBER_DIGITS_COUNT = 6;
 const SECURITY_QUESTIONS_COUNT = 3;
@@ -141,7 +141,7 @@ describe('LoginDetailsView', () => {
     } satisfies LoginDetailsFormValues;
 
     // And a rendered component
-    const { location } = renderWithRouter(
+    const { router } = renderWithRouter(
       <LoginDetailsView loginDetails={loginDetails} />,
       {
         dashboardPath: '/login-details/confirmation',
@@ -156,11 +156,11 @@ describe('LoginDetailsView', () => {
 
     // Then it should navigate to confirmation page
     await waitFor(() =>
-      expect(location.pathname).toBe('/login-details/confirmation')
+      expect(router.state.location.pathname).toBe('/login-details/confirmation')
     );
 
-    // And it should have two history entries
-    expect(history.length).toBe(2);
+    // And it should have PUSH history action
+    expect(router.state.historyAction).toBe('PUSH');
   });
 
   it('should set login details in app context', async () => {
@@ -185,7 +185,7 @@ describe('LoginDetailsView', () => {
     } satisfies LoginDetailsFormValues;
 
     // And a rendered component
-    const { location } = renderWithRouter(
+    const { router } = renderWithRouter(
       <LoginDetailsView loginDetails={loginDetails} />,
       {
         dashboardPath: '/login-details/confirmation',
@@ -199,10 +199,11 @@ describe('LoginDetailsView', () => {
     await userEvent.click(continueButton);
 
     // Then it should navigate to confirmation page
-    expect(location.pathname).toBe('/login-details/confirmation');
+    await waitFor(
+      () => expect(router.state.location.pathname).toBe('/login-details/confirmation'))
 
-    // And it should have two history entries
-    expect(history.length).toBe(2);
+    // And it should have PUSH history action
+    expect(router.state.historyAction).toBe("PUSH");
 
     // And it should set login details in app context
     assertAppContextValue('loginDetails.password', loginDetails.password);
@@ -238,7 +239,23 @@ describe('LoginDetailsView', () => {
 
   describe.skip('Password field', () => {});
 
-  describe.skip('Secure number field', () => {});
+  describe.skip('Secure number field', () => {
+    it.skip('should allow to focus only on first digit when field is empty');
+    it.skip('should allow to focus on each digit when field is filled');
+    it.skip('should allow to enter only one digit to each field');
+    it.skip('should focus on next digit field when enter the digit');
+    it.skip(
+      'should stay focused on last digit field when enter the last digit'
+    );
+    it.skip('should focus on previous digit field when backspace the digit');
+    it.skip(
+      'should stay focused on first digit field when backspace the first digit'
+    );
+    it.skip('should allow to paste the single digit to each field');
+    it.skip(
+      'should fill the digits when focus first digit field and paste exactly 6 digits'
+    );
+  });
 
   describe.skip('Security question fields', () => {});
 });

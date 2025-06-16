@@ -1,5 +1,10 @@
 import { render } from '@testing-library/react';
-import { createMemoryRouter, Outlet, RouterProvider } from 'react-router';
+import type React from 'react';
+import {
+  createMemoryRouter,
+  Outlet,
+  RouterProvider
+} from 'react-router';
 import { AppContextProvider } from '../../../src/contexts/AppContext';
 import { AppContextTestingDashboard } from './AppContextTestingDashboard';
 
@@ -11,6 +16,7 @@ export const renderWithRouter = (
   element: React.ReactNode,
   { dashboardPath }: ReactWithRouterOptions = {}
 ) => {
+
   const Wrapper = () => {
     return (
       <AppContextProvider>
@@ -43,12 +49,12 @@ export const renderWithRouter = (
         ],
       },
     ],
-    { initialEntries: ['/'] }
+    { initialEntries: ['/'], initialIndex: 0 }
   );
 
   render(<RouterProvider router={router} />);
 
   return {
-    location: router.state.location,
+    router,
   };
 };
