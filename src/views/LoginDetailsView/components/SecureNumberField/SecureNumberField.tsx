@@ -42,7 +42,8 @@ export const SecureNumberField: React.FC = () => {
       const securityNumbers = getValues('securityNumbers');
       if (
         event.key === 'Backspace' &&
-        securityNumbers[index] === '' &&
+        (securityNumbers[index] === '' ||
+          securityNumbers[index] === undefined) &&
         index > 0
       ) {
         focusInput(index - 1);

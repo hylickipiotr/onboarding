@@ -80,7 +80,7 @@ export const FormContainer: React.FC<
 const getDefaultValues = (values?: LoginDetailsFormValues) => {
   const defaultValues = {
     password: '',
-    securityNumbers: [],
+    securityNumbers: Array.from({ length: 6 }).map(() => ''),
     securityQuestions: [],
   };
 
