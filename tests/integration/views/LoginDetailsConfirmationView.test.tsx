@@ -45,8 +45,7 @@ describe('LoginDetailsConfirmationView', () => {
       expect(history.location.pathname).toBe('/login-details');
 
       // And history index should be 0
-      // TODO fix this
-      // expect(history.index).toBe(0);
+      expect(history.index).toBe(0);
     });
   });
 });

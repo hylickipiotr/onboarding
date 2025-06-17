@@ -1,17 +1,12 @@
 import { render } from '@testing-library/react';
+import { createMemoryHistory } from 'history';
 import type React from 'react';
 import {
-  createRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from 'react';
-import {
-  createMemoryRouter,
+  unstable_HistoryRouter as HistoryRouter,
   Outlet,
-  RouterProvider,
-  useLocation,
+  Route,
+  Routes,
+  type HistoryRouterProps,
 } from 'react-router';
 import { AppContextProvider } from '../../../src/contexts/AppContext';
 import type { AppContextState } from '../../../src/contexts/AppContext/AppContext.types';
@@ -24,11 +19,6 @@ type ReactWithRouterOptions = {
   appContext?: Partial<AppContextState>;
 };
 
-type History = {
-  getPathname: () => string;
-  getIndex: () => number;
-};
-
 export const renderWithRouter = (
   element: React.ReactNode,
   {
@@ -38,77 +28,36 @@ export const renderWithRouter = (
     appContext,
   }: ReactWithRouterOptions = {}
 ) => {
-  const LocationTracker: React.FC<{ ref: React.Ref<History> }> = ({
-    ref,
-  }) => {
-    const location = useLocation();
-    const indexRef = useRef(initialIndex);
-
-    const [pathname, setPathname] = useState(location.pathname);
-
-    useEffect(() => {
-      setPathname(location.pathname);
-      indexRef.current++;
-    }, [location.pathname]);
-
-    useImperativeHandle(ref, () => ({
-      getPathname: () => pathname,
-      getIndex: () => indexRef.current - 1,
-    }));
-
-    return null;
-  };
-
-  const trackerRef = createRef<History>();
-
   const Wrapper = () => {
     return (
       <AppContextProvider defaultState={appContext}>
-        <LocationTracker ref={trackerRef} />
         <Outlet />
       </AppContextProvider>
     );
   };
 
-  const router = createMemoryRouter(
-    [
-      {
-        element: <Wrapper />,
-        children: [
-          {
-            path: '/',
-            element,
-          },
-          ...(dashboardPath
-            ? [
-                {
-                  path: dashboardPath,
-                  element: <AppContextTestingDashboard />,
-                },
-              ]
-            : []),
-          {
-            path: '*',
-            element: <p>Not found</p>,
-          },
-        ],
-      },
-    ],
-    { initialEntries, initialIndex }
+  const history = createMemoryHistory({ initialEntries, initialIndex });
+
+  render(
+    <HistoryRouter
+      history={history as unknown as HistoryRouterProps['history']}
+    >
+      <Routes>
+        <Route element={<Wrapper />}>
+          <Route path="/" element={element} />
+          {dashboardPath ? (
+            <Route
+              path={dashboardPath}
+              element={<AppContextTestingDashboard />}
+            />
+          ) : null}
+          <Route path="*" element={<p>Not found</p>} />
+        </Route>
+      </Routes>
+    </HistoryRouter>
   );
 
-  render(<RouterProvider router={router} />);
-
   return {
-    history: {
-      location: {
-        get pathname() {
-          return trackerRef.current?.getPathname() ?? '';
-        },
-      },
-      get index() {
-        return trackerRef.current?.getIndex() ?? -1;
-      },
-    },
+    history,
   };
 };

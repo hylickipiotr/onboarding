@@ -129,7 +129,7 @@ describe('LoginDetailsView', () => {
         expect(history.location.pathname).toBe('/login-details/confirmation')
       );
 
-      // And it should have PUSH history action
+      // And it should have history index equal to 1
       expect(history.index).toBe(1);
     });
 
@@ -154,7 +154,7 @@ describe('LoginDetailsView', () => {
         expect(history.location.pathname).toBe('/login-details/confirmation')
       );
 
-      // And it should have PUSH history action
+      // And it should have history index equal to 1
       expect(history.index).toBe(1);
 
       // And it should set login details in app context
