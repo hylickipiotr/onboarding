@@ -1,8 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { LoginDetailsState } from '../../../src/contexts/AppContext/LoginDetails/LoginDetails.types';
 import { SECURE_NUMBER_DIGITS_COUNT } from '../../../src/views/LoginDetailsView/components/SecureNumberField/SecureNumberField';
-import { LoginDetailsView } from '../../../src/views/LoginDetailsView/LoginDetailsView';
+import { SECURITY_QUESTION_OPTIONS } from '../../../src/views/LoginDetailsView/components/SecureQuestionField/SecurityQuestionField.config';
+import { LoginDetailsViewGuard } from '../../../src/views/LoginDetailsView/LoginDetailsView.guard';
 import { loginDetailsFactory } from '../factories/loginDetailsFactory';
 import { assertAppContextValue } from '../utils/asserts';
 import { renderWithRouter } from '../utils/renderWithRouter';
@@ -10,182 +12,215 @@ import { renderWithRouter } from '../utils/renderWithRouter';
 const SECURITY_QUESTIONS_COUNT = 3;
 
 describe('LoginDetailsView', () => {
-  it('should render correctly', () => {
-    // Given a login details
-    const loginDetails = loginDetailsFactory.build();
+  describe('happy path', () => {
+    it('should render correctly', () => {
+      // Given a login details
+      const loginDetails = loginDetailsFactory.build();
 
-    // When a component is rendered
-    renderWithRouter(<LoginDetailsView loginDetails={loginDetails} />);
-
-    // Then it should render page heading
-    expect(
-      screen.getByRole('heading', {
-        name: 'Create your login details',
-        level: 1,
-      })
-    ).toBeInTheDocument();
-
-    // And it should render static text
-    expect(
-      screen.getByText(
-        "You'll need these to log in to the website or app, unless you use face or fingerprint recognition."
-      )
-    ).toBeInTheDocument();
-
-    // And it should render password label
-    const passwordLabel = screen.getByText('Password');
-    expect(passwordLabel).toBeInTheDocument();
-    expect(passwordLabel).toHaveAttribute('for', 'password');
-
-    // And it should render password field
-    const passwordTextbox = screen.getByTestId('password');
-    expect(passwordTextbox).toBeInTheDocument();
-    expect(passwordTextbox).toBeEnabled();
-    expect(passwordTextbox).toHaveAttribute('type', 'password');
-    expect(passwordTextbox).toHaveValue(loginDetails.password);
-
-    // And it should render password description
-    const passwordDescription = screen.getByText(
-      'At least 8 characters, 1 lowercase letter, 1 number and 1 uppercase letter'
-    );
-    expect(passwordDescription).toBeInTheDocument();
-    expect(passwordDescription).toHaveAttribute('id', 'password-description');
-
-    // And it should render secure number field
-    expect(
-      screen.getByRole('group', {
-        name: 'Secure number',
-        description: 'Create a 6 digit number to access your account',
-      })
-    ).toBeInTheDocument();
-    Array.from({ length: SECURE_NUMBER_DIGITS_COUNT }).forEach((_, index) => {
-      const digitTextbox = screen.getByRole('textbox', {
-        name: `Digit ${index + 1} of 6`,
+      // When a component is rendered with app context
+      renderWithRouter(<LoginDetailsViewGuard />, {
+        appContext: { loginDetails },
       });
-      expect(digitTextbox).toBeInTheDocument();
-      expect(digitTextbox).toBeEnabled();
-      expect(digitTextbox).toHaveValue(loginDetails.securityNumber[index]);
+
+      // Then it should render page heading
+      expect(
+        screen.getByRole('heading', {
+          name: 'Create your login details',
+          level: 1,
+        })
+      ).toBeInTheDocument();
+
+      // And it should render static text
+      expect(
+        screen.getByText(
+          "You'll need these to log in to the website or app, unless you use face or fingerprint recognition."
+        )
+      ).toBeInTheDocument();
+
+      // And it should render password label
+      const passwordLabel = screen.getByText('Password');
+      expect(passwordLabel).toBeInTheDocument();
+      expect(passwordLabel).toHaveAttribute('for', 'password');
+
+      // And it should render password field
+      const passwordTextbox = screen.getByTestId('password');
+      expect(passwordTextbox).toBeInTheDocument();
+      expect(passwordTextbox).toBeEnabled();
+      expect(passwordTextbox).toHaveAttribute('type', 'password');
+      expect(passwordTextbox).toHaveValue(loginDetails.password);
+
+      // And it should render password description
+      const passwordDescription = screen.getByText(
+        'At least 8 characters, 1 lowercase letter, 1 number and 1 uppercase letter'
+      );
+      expect(passwordDescription).toBeInTheDocument();
+      expect(passwordDescription).toHaveAttribute('id', 'password-description');
+
+      // And it should render secure number field
+      expect(
+        screen.getByRole('group', {
+          name: 'Secure number',
+          description: 'Create a 6 digit number to access your account',
+        })
+      ).toBeInTheDocument();
+      Array.from({ length: SECURE_NUMBER_DIGITS_COUNT }).forEach((_, index) => {
+        const digitTextbox = screen.getByRole('textbox', {
+          name: `Digit ${index + 1} of 6`,
+        });
+        expect(digitTextbox).toBeInTheDocument();
+        expect(digitTextbox).toBeEnabled();
+        expect(digitTextbox).toHaveValue(loginDetails.securityNumber[index]);
+      });
+
+      // And it should render security question field
+      expect(
+        screen.getByRole('group', {
+          name: 'Security questions',
+          description: "We'll only ask you these if you forget your password.",
+        })
+      ).toBeInTheDocument();
+      Array.from({ length: SECURITY_QUESTIONS_COUNT }).forEach((_, index) => {
+        const questionElement = screen.getByRole('combobox', {
+          name: `Question ${index + 1}`,
+        });
+        expect(questionElement).toBeInTheDocument();
+        expect(questionElement).toBeEnabled();
+        expect(questionElement).toHaveValue(
+          loginDetails.securityQuestions[index].question
+        );
+
+        const answerElement = screen.getByRole('textbox', {
+          name: `Answer ${index + 1}`,
+        });
+        expect(answerElement).toBeInTheDocument();
+        expect(answerElement).toBeEnabled();
+        expect(answerElement).toHaveValue(
+          loginDetails.securityQuestions[index].answer
+        );
+      });
+
+      // And it should render continue button
+      const continueButton = screen.getByRole('button', {
+        name: 'Continue',
+      });
+      expect(continueButton).toBeInTheDocument();
+      expect(continueButton).toHaveAttribute('type', 'submit');
+      expect(continueButton).toBeEnabled();
     });
 
-    // And it should render security question field
-    expect(
-      screen.getByRole('group', {
-        name: 'Security questions',
-        description: "We'll only ask you these if you forget your password.",
-      })
-    ).toBeInTheDocument();
-    Array.from({ length: SECURITY_QUESTIONS_COUNT }).forEach((_, index) => {
-      const questionElement = screen.getByRole('combobox', {
-        name: `Question ${index + 1}`,
+    it('should navigate to confirmation page after clicking continue button', async () => {
+      // Given a login details
+      const loginDetails = loginDetailsFactory.build();
+
+      // And a rendered component with app context
+      const { history } = renderWithRouter(<LoginDetailsViewGuard />, {
+        appContext: { loginDetails },
+        dashboardPath: '/login-details/confirmation',
       });
-      expect(questionElement).toBeInTheDocument();
-      expect(questionElement).toBeEnabled();
-      expect(questionElement).toHaveValue(
-        loginDetails.securityQuestions[index].question
+
+      // When clicking continue button
+      const continueButton = screen.getByRole('button', {
+        name: 'Continue',
+      });
+      await userEvent.click(continueButton);
+
+      // Then it should navigate to confirmation page
+      await waitFor(() =>
+        expect(history.location.pathname).toBe('/login-details/confirmation')
       );
 
-      const answerElement = screen.getByRole('textbox', {
-        name: `Answer ${index + 1}`,
+      // And it should have PUSH history action
+      expect(history.index).toBe(1);
+    });
+
+    it('should set login details in app context after clicking continue button', async () => {
+      // Given a login details
+      const loginDetails = loginDetailsFactory.build();
+
+      // And a rendered component with app context
+      const { history } = renderWithRouter(<LoginDetailsViewGuard />, {
+        appContext: { loginDetails },
+        dashboardPath: '/login-details/confirmation',
       });
-      expect(answerElement).toBeInTheDocument();
-      expect(answerElement).toBeEnabled();
-      expect(answerElement).toHaveValue(
-        loginDetails.securityQuestions[index].answer
+
+      // When clicking continue button
+      const continueButton = screen.getByRole('button', {
+        name: 'Continue',
+      });
+      await userEvent.click(continueButton);
+
+      // Then it should navigate to confirmation page
+      await waitFor(() =>
+        expect(history.location.pathname).toBe('/login-details/confirmation')
+      );
+
+      // And it should have PUSH history action
+      expect(history.index).toBe(1);
+
+      // And it should set login details in app context
+      assertAppContextValue('loginDetails.password', loginDetails.password);
+      assertAppContextValue(
+        'loginDetails.securityNumber',
+        loginDetails.securityNumber
+      );
+      assertAppContextValue(
+        'loginDetails.securityQuestions.0.question',
+        loginDetails.securityQuestions[0].question
+      );
+      assertAppContextValue(
+        'loginDetails.securityQuestions.0.answer',
+        loginDetails.securityQuestions[0].answer
+      );
+      assertAppContextValue(
+        'loginDetails.securityQuestions.1.question',
+        loginDetails.securityQuestions[1].question
+      );
+      assertAppContextValue(
+        'loginDetails.securityQuestions.1.answer',
+        loginDetails.securityQuestions[1].answer
+      );
+      assertAppContextValue(
+        'loginDetails.securityQuestions.2.question',
+        loginDetails.securityQuestions[2].question
+      );
+      assertAppContextValue(
+        'loginDetails.securityQuestions.2.answer',
+        loginDetails.securityQuestions[2].answer
       );
     });
-
-    // And it should render continue button
-    const continueButton = screen.getByRole('button', {
-      name: 'Continue',
-    });
-    expect(continueButton).toBeInTheDocument();
-    expect(continueButton).toHaveAttribute('type', 'submit');
-    expect(continueButton).toBeEnabled();
   });
 
-  it('should navigate to confirmation page after clicking continue button', async () => {
-    // Given a login details
-    const loginDetails = loginDetailsFactory.build();
+  describe('unhappy path', () => {
+    it('should render empty form when the app context contains incorrect shape of login details object', () => {
+      // When a render component with app context containing incorrect shape of login details object
+      renderWithRouter(<LoginDetailsViewGuard />, {
+        appContext: { loginDetails: {} as LoginDetailsState },
+      });
 
-    // And a rendered component
-    const { history } = renderWithRouter(
-      <LoginDetailsView loginDetails={loginDetails} />,
-      {
-        dashboardPath: '/login-details/confirmation',
-      }
-    );
+      // Then password field should be empty
+      expect(screen.getByTestId('password')).toHaveValue('');
 
-    // When clicking continue button
-    const continueButton = screen.getByRole('button', {
-      name: 'Continue',
+      // And security number fields should be empty
+      screen
+        .getAllByRole('textbox', { name: /Digit \d of \d/i })
+        .forEach((textbox) => {
+          expect(textbox).toHaveValue('');
+        });
+
+      // And security question fields should be empty
+      screen
+        .getAllByRole('combobox', { name: /Question \d/i })
+        .forEach((combobox) => {
+          expect(combobox).toHaveValue('');
+        });
+
+      // And security answer fields should be empty
+      screen
+        .getAllByRole('textbox', { name: /Answer \d/i })
+        .forEach((textbox) => {
+          expect(textbox).toHaveValue('');
+        });
     });
-    await userEvent.click(continueButton);
-
-    // Then it should navigate to confirmation page
-    await waitFor(() =>
-      expect(history.location.pathname).toBe('/login-details/confirmation')
-    );
-
-    // And it should have PUSH history action
-    expect(history.index).toBe(1);
-  });
-
-  it('should set login details in app context after clicking continue button', async () => {
-    // Given a login details
-    const loginDetails = loginDetailsFactory.build();
-
-    // And a rendered component
-    const { history } = renderWithRouter(
-      <LoginDetailsView loginDetails={loginDetails} />,
-      {
-        dashboardPath: '/login-details/confirmation',
-      }
-    );
-
-    // When clicking continue button
-    const continueButton = screen.getByRole('button', {
-      name: 'Continue',
-    });
-    await userEvent.click(continueButton);
-
-    // Then it should navigate to confirmation page
-    await waitFor(() =>
-      expect(history.location.pathname).toBe('/login-details/confirmation')
-    );
-
-    // And it should have PUSH history action
-    expect(history.index).toBe(1);
-
-    // And it should set login details in app context
-    assertAppContextValue('loginDetails.password', loginDetails.password);
-    assertAppContextValue(
-      'loginDetails.securityNumber',
-      loginDetails.securityNumber
-    );
-    assertAppContextValue(
-      'loginDetails.securityQuestions.0.question',
-      loginDetails.securityQuestions[0].question
-    );
-    assertAppContextValue(
-      'loginDetails.securityQuestions.0.answer',
-      loginDetails.securityQuestions[0].answer
-    );
-    assertAppContextValue(
-      'loginDetails.securityQuestions.1.question',
-      loginDetails.securityQuestions[1].question
-    );
-    assertAppContextValue(
-      'loginDetails.securityQuestions.1.answer',
-      loginDetails.securityQuestions[1].answer
-    );
-    assertAppContextValue(
-      'loginDetails.securityQuestions.2.question',
-      loginDetails.securityQuestions[2].question
-    );
-    assertAppContextValue(
-      'loginDetails.securityQuestions.2.answer',
-      loginDetails.securityQuestions[2].answer
-    );
   });
 
   describe('Password field', () => {
@@ -196,7 +231,7 @@ describe('LoginDetailsView', () => {
       });
 
       // And a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // And a requirement not met the password
       const notMetLengthRequirement = screen.getByRole('listitem', {
@@ -238,7 +273,7 @@ describe('LoginDetailsView', () => {
       });
 
       // And a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // When typing password with
       await userEvent.type(screen.getByTestId('password'), password);
@@ -262,7 +297,7 @@ describe('LoginDetailsView', () => {
       });
 
       // And a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // When typing password with
       await userEvent.type(screen.getByTestId('password'), password);
@@ -287,7 +322,7 @@ describe('LoginDetailsView', () => {
       });
 
       // And a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // When typing password with
       await userEvent.type(screen.getByTestId('password'), password);
@@ -312,7 +347,7 @@ describe('LoginDetailsView', () => {
       });
 
       // And a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // When typing password with
       await userEvent.type(screen.getByTestId('password'), password);
@@ -339,7 +374,7 @@ describe('LoginDetailsView', () => {
       });
 
       // And a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // When typing secure number with
       await userEvent.type(screen.getByTestId('password'), password);
@@ -383,7 +418,7 @@ describe('LoginDetailsView', () => {
   describe('Secure number field', () => {
     it('should focus on first digit when clicking on legend', async () => {
       // Given a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // When clicking on legend
       await userEvent.click(screen.getByText('Secure number'));
@@ -396,7 +431,7 @@ describe('LoginDetailsView', () => {
 
     it('should allow to focus only on first digit when field is empty', async () => {
       // Given a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // When clicking on second digit
       await userEvent.click(
@@ -413,8 +448,10 @@ describe('LoginDetailsView', () => {
       // Given a login details
       const loginDetails = loginDetailsFactory.build();
 
-      // And a rendered component
-      renderWithRouter(<LoginDetailsView loginDetails={loginDetails} />);
+      // And a rendered component with app context
+      renderWithRouter(<LoginDetailsViewGuard />, {
+        appContext: { loginDetails },
+      });
 
       // When clicking on second digit
       await userEvent.click(
@@ -429,7 +466,7 @@ describe('LoginDetailsView', () => {
 
     it('should focus on next digit field when enter the digit', async () => {
       // Given a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // When entering the digit to first digit field
       const firstDigit = screen.getByRole('textbox', { name: 'Digit 1 of 6' });
@@ -441,7 +478,7 @@ describe('LoginDetailsView', () => {
 
     it('should allow to enter only one digit to each field', async () => {
       // Given a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // When enter two digits to first digit field
       const firstDigit = screen.getByRole('textbox', { name: 'Digit 1 of 6' });
@@ -462,7 +499,7 @@ describe('LoginDetailsView', () => {
 
     it('should stay focused on last digit field when enter the last digit', async () => {
       // Given a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // When entering the full length of the secure number
       await userEvent.type(
@@ -477,7 +514,7 @@ describe('LoginDetailsView', () => {
 
     it('should focus on previous digit field when clicking on backspace when the field is empty', async () => {
       // Given a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // And entering the full length of the secure number
       await userEvent.type(
@@ -502,7 +539,7 @@ describe('LoginDetailsView', () => {
 
     it('should stay focused on first digit field when backspace the first digit', async () => {
       // Given a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // When backspacing the first empty digit field
       await userEvent.type(
@@ -518,7 +555,7 @@ describe('LoginDetailsView', () => {
 
     it('should allow to paste the single digit to each field', async () => {
       // Given a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // And clicking on first digit field
       const firstDigit = screen.getByRole('textbox', { name: 'Digit 1 of 6' });
@@ -553,7 +590,7 @@ describe('LoginDetailsView', () => {
 
     it('should fill the digits when focus first digit field and paste exactly 6 digits', async () => {
       // Given a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // And clicking on first digit field
       const firstDigit = screen.getByRole('textbox', { name: 'Digit 1 of 6' });
@@ -589,7 +626,7 @@ describe('LoginDetailsView', () => {
 
     it('should mark the field as invalid when blurring the field and the field is empty', async () => {
       // Given a rendered component
-      renderWithRouter(<LoginDetailsView />);
+      renderWithRouter(<LoginDetailsViewGuard />);
 
       // When clicking on first digit field
       const firstDigit = screen.getByRole('textbox', { name: 'Digit 1 of 6' });
@@ -645,8 +682,125 @@ describe('LoginDetailsView', () => {
   });
 
   describe('Security question fields', () => {
-    it('should render 3 security questions', async () => {});
+    it('should render correct amount of security question fields', () => {
+      // Given a rendered component
+      renderWithRouter(<LoginDetailsViewGuard />);
 
-    it('should display the validation messages correctly', async () => {});
+      // Then it should render 3 security question fields
+      expect(
+        screen.getAllByRole('combobox', { name: /Question \d/i })
+      ).toHaveLength(3);
+
+      // And it should render 3 security answer fields
+      expect(
+        screen.getAllByRole('textbox', { name: /Answer \d/i })
+      ).toHaveLength(3);
+    });
+
+    it('should display the validation messages correctly', async () => {
+      // Given a question validation message
+      const questionValidationMessage =
+        'Please choose a question from the list';
+
+      // And an answer validation message
+      const answerValidationMessage = 'Please enter an answer';
+
+      // And a rendered component
+      renderWithRouter(<LoginDetailsViewGuard />);
+
+      // When clicking on Continue button
+      await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+      // Then it should display the validation message correctly for questions field
+      const securityQuestions = screen.getAllByRole('combobox', {
+        name: /Question \d/i,
+      });
+
+      securityQuestions.forEach((question) => {
+        expect(question).toHaveAccessibleErrorMessage(
+          'Please choose a question from the list'
+        );
+      });
+
+      // And it should display the validation message correctly for answers field
+      const securityAnswers = screen.getAllByRole('textbox', {
+        name: /Answer \d/i,
+      });
+
+      securityAnswers.forEach((answer) => {
+        expect(answer).toHaveAccessibleErrorMessage('Please enter an answer');
+      });
+
+      // When selecting a question
+      const optionsToSelect = [
+        'maiden-name',
+        'city-of-birth',
+        'first-pet-name',
+      ] as const;
+      for (
+        let securityQuestionIndex = 0;
+        securityQuestionIndex < securityQuestions.length;
+        securityQuestionIndex += 1
+      ) {
+        const optionToSelect = optionsToSelect[securityQuestionIndex];
+        const securityQuestion = securityQuestions[securityQuestionIndex];
+        await userEvent.selectOptions(securityQuestion, [optionToSelect]);
+
+        // Then the error message should be removed
+        expect(securityQuestion).not.toHaveAccessibleErrorMessage(
+          questionValidationMessage
+        );
+      }
+
+      // When entering an answer
+      const securityAnswersToEnter = ['answer1', 'answer2', 'answer3'] as const;
+      for (
+        let securityAnswerIndex = 0;
+        securityAnswerIndex < securityAnswers.length;
+        securityAnswerIndex += 1
+      ) {
+        const answerToEnter = securityAnswersToEnter[securityAnswerIndex];
+        const securityAnswer = securityAnswers[securityAnswerIndex];
+        await userEvent.type(securityAnswer, answerToEnter);
+
+        // Then the error message should be removed
+        expect(securityAnswer).not.toHaveAccessibleErrorMessage(
+          answerValidationMessage
+        );
+      }
+    });
+
+    it('should prevent duplicate question selections across all comboboxes', async () => {
+      // Given a rendered component with multiple security question comboboxes
+      renderWithRouter(<LoginDetailsViewGuard />);
+
+      const securityQuestions = screen.getAllByRole('combobox', {
+        name: /Question \d/i,
+      });
+
+      const selectedLabels = new Set<string>();
+
+      // When selecting a unique question in each combobox
+      for (const securityQuestion of securityQuestions) {
+        const availableOptions = SECURITY_QUESTION_OPTIONS.filter(
+          (option) => !selectedLabels.has(option.label)
+        );
+
+        const questionToSelect = availableOptions[0];
+        selectedLabels.add(questionToSelect.label);
+
+        await userEvent.selectOptions(securityQuestion, questionToSelect.label);
+      }
+
+      // Then each combobox should not include previously selected options
+      for (const selected of selectedLabels) {
+        const duplicateOptions = screen.queryAllByRole('option', {
+          name: selected,
+        });
+
+        // And should only appear once across all comboboxes
+        expect(duplicateOptions).toHaveLength(1);
+      }
+    });
   });
 });

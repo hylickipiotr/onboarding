@@ -15,6 +15,7 @@ type FormContainerProps = Omit<
 const LoginDetailsFormSchema = z.object({
   password: z
     .string()
+    .trim()
     .min(8, {
       message: 'At least 8 characters',
     })
@@ -34,11 +35,18 @@ const LoginDetailsFormSchema = z.object({
       message: 'Each field must be filled',
     }),
   securityQuestions: z
-    .object({
-      question: z.string(),
-      answer: z.string(),
-    })
-    .array()
+    .array(
+      z.object({
+        question: z.string({
+          required_error: 'Please choose a question from the list',
+        }),
+        answer: z
+          .string({
+            required_error: 'Please enter an answer',
+          })
+          .trim(),
+      })
+    )
     .length(3),
 });
 
@@ -64,13 +72,9 @@ export const FormContainer: React.FC<
     navigate('/login-details/confirmation');
   };
 
-  const onError = (error: unknown) => {
-    console.error(error);
-  };
-
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit, onError)} {...props}>
+      <form onSubmit={form.handleSubmit(onSubmit)} {...props}>
         {children}
       </form>
     </FormProvider>

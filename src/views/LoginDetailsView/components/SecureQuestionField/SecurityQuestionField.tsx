@@ -1,5 +1,6 @@
 import { useController, useFormContext } from 'react-hook-form';
 import { FormField } from '../../../../components/FormField/FormField';
+import { getFormFieldErrorMessageId } from '../../../../components/FormField/FormField.helpers';
 import { Select } from '../../../../components/Select/Select';
 import type { LoginDetailsFormValues } from '../FormContainer/FormContainer';
 import { SECURITY_QUESTION_OPTIONS } from './SecurityQuestionField.config';
@@ -36,6 +37,7 @@ export const SecurityQuestionField: React.FC<QuestionFieldProps> = ({
         value={(field.value as string) ?? ''}
         placeholder="Select a question"
         error={!!fieldState.error}
+        aria-errormessage={getFormFieldErrorMessageId(field.name)}
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

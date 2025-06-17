@@ -1,5 +1,6 @@
 import { useController } from 'react-hook-form';
 import { FormField } from '../../../../components/FormField/FormField';
+import { getFormFieldErrorMessageId } from '../../../../components/FormField/FormField.helpers';
 import { Input } from '../../../../components/Input/Input';
 
 type SecurityAnswerFieldProps = {
@@ -25,6 +26,7 @@ export const SecurityAnswerField: React.FC<SecurityAnswerFieldProps> = ({
         id={field.name}
         value={(field.value as string) ?? ''}
         error={!!fieldState.error}
+        aria-errormessage={getFormFieldErrorMessageId(field.name)}
       />
     </FormField>
   );
