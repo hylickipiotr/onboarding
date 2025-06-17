@@ -4,7 +4,7 @@ import factory from "factory.ts";
 
 import type { LoginDetailsState } from "../../../src/contexts/AppContext/LoginDetails/LoginDetails.types";
 
-const generatePassword = () => {
+export const generatePassword = () => {
   const upperCaseFragment = faker.string.alphanumeric({
     length: faker.number.int({ min: 3, max: 10 }),
     casing: 'upper',

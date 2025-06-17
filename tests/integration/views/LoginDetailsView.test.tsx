@@ -5,7 +5,7 @@ import type { LoginDetailsState } from '../../../src/contexts/AppContext/LoginDe
 import { SECURE_NUMBER_DIGITS_COUNT } from '../../../src/views/LoginDetailsView/components/SecureNumberField/SecureNumberField';
 import { SECURITY_QUESTION_OPTIONS } from '../../../src/views/LoginDetailsView/components/SecureQuestionField/SecurityQuestionField.config';
 import { LoginDetailsViewGuard } from '../../../src/views/LoginDetailsView/LoginDetailsView.guard';
-import { loginDetailsFactory } from '../factories/loginDetailsFactory';
+import { generatePassword, loginDetailsFactory } from '../factories/loginDetailsFactory';
 import { assertAppContextValue } from '../utils/asserts';
 import { renderWithRouter } from '../utils/renderWithRouter';
 
@@ -341,10 +341,7 @@ describe('LoginDetailsView', () => {
 
     it('should met all requirements', async () => {
       // Given a string with at least 8 characters
-      const password = faker.string.alphanumeric({
-        length: faker.number.int({ min: 8, max: 100 }),
-        casing: 'mixed',
-      });
+      const password = generatePassword();
 
       // And a rendered component
       renderWithRouter(<LoginDetailsViewGuard />);
