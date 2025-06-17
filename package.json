@@ -13,7 +13,6 @@
     "ci:test": "vitest",
     "ci:build": "tsc -b && vite build",
     "ci:deploy": "cdk deploy --require-approval never"
-
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -39,6 +38,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.5.2",
+    "aws-cdk": "^2.1018.1",
     "aws-cdk-lib": "^2.201.0",
     "constructs": "^10.4.2",
     "eslint": "^9.28.0",
