@@ -410,7 +410,7 @@ describe('LoginDetailsView', () => {
       ).toHaveFocus();
     });
 
-    it('should allow to focus on each digit when field is filled', async () => {
+    it('should allow to focus on middle digit when all digits are filled', async () => {
       // Given a login details
       const loginDetails = loginDetailsFactory.build();
 
@@ -423,16 +423,170 @@ describe('LoginDetailsView', () => {
       );
 
       // Then it should focus on second digit
+      expect(
+        screen.getByRole('textbox', { name: 'Digit 2 of 6' })
+      ).toHaveFocus();
+    });
+
+    it('should focus on next digit field when enter the digit', async () => {
+      // Given a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // When entering the digit to first digit field
+      const firstDigit = screen.getByRole('textbox', { name: 'Digit 1 of 6' });
+      await userEvent.type(firstDigit, '1');
+
+      // Then it should focus on second digit
       expect(screen.getByRole('textbox', { name: 'Digit 2 of 6' }));
     });
-    
-    it.skip('should allow to enter only one digit to each field', async () => {});
-    it.skip('should focus on next digit field when enter the digit', async () => {});
-    it.skip('should stay focused on last digit field when enter the last digit', async () => {});
-    it.skip('should focus on previous digit field when backspace the digit', async () => {});
-    it.skip('should stay focused on first digit field when backspace the first digit', async () => {});
-    it.skip('should allow to paste the single digit to each field', async () => {});
-    it.skip('should fill the digits when focus first digit field and paste exactly 6 digits', async () => {});
+
+    it('should allow to enter only one digit to each field', async () => {
+      // Given a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // When enter two digits to first digit field
+      const firstDigit = screen.getByRole('textbox', { name: 'Digit 1 of 6' });
+      await userEvent.type(firstDigit, '12');
+
+      // Then it should have only one digit
+      expect(firstDigit).toHaveValue('1');
+
+      // And the second digit field should have second digit
+      const secondDigit = screen.getByRole('textbox', { name: 'Digit 2 of 6' });
+      expect(secondDigit).toHaveValue('2');
+
+      // And the third digit field should be focused and empty
+      const thirdDigit = screen.getByRole('textbox', { name: 'Digit 3 of 6' });
+      expect(thirdDigit).toHaveFocus();
+      expect(thirdDigit).toHaveValue('');
+    });
+
+    it('should stay focused on last digit field when enter the last digit', async () => {
+      // Given a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // When entering the full length of the secure number
+      await userEvent.type(
+        screen.getByRole('textbox', { name: 'Digit 1 of 6' }),
+        '123456'
+      );
+
+      // Then it should focus on last digit
+      const lastDigit = screen.getByRole('textbox', { name: 'Digit 6 of 6' });
+      expect(lastDigit).toHaveFocus();
+    });
+
+    it('should focus on previous digit field when clicking on backspace when the field is empty', async () => {
+      // Given a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // And entering the full length of the secure number
+      await userEvent.type(
+        screen.getByRole('textbox', { name: 'Digit 1 of 6' }),
+        '123456'
+      );
+
+      // And backspacing the last digit field
+      const lastDigit = screen.getByRole('textbox', { name: 'Digit 6 of 6' });
+      await userEvent.type(lastDigit, '{backspace}');
+
+      // When backspacing the empty digit field
+      await userEvent.type(lastDigit, '{backspace}');
+
+      // Then it should focus on previous digit
+      const previousDigit = screen.getByRole('textbox', {
+        name: 'Digit 5 of 6',
+      });
+      expect(previousDigit).toHaveFocus();
+      expect(previousDigit).toHaveValue('5');
+    });
+
+    it('should stay focused on first digit field when backspace the first digit', async () => {
+      // Given a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // When backspacing the first empty digit field
+      await userEvent.type(
+        screen.getByRole('textbox', { name: 'Digit 1 of 6' }),
+        '{backspace}'
+      );
+
+      // Then it should focus on first digit
+      const firstDigit = screen.getByRole('textbox', { name: 'Digit 1 of 6' });
+      expect(firstDigit).toHaveFocus();
+      expect(firstDigit).toHaveValue('');
+    });
+
+    it('should allow to paste the single digit to each field', async () => {
+      // Given a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // And clicking on first digit field
+      const firstDigit = screen.getByRole('textbox', { name: 'Digit 1 of 6' });
+      await userEvent.click(firstDigit);
+
+      // When pasting the digit
+      await userEvent.paste('1');
+
+      // Then it should have only one digit
+      expect(firstDigit).toHaveValue('1');
+
+      // When clicking on second digit field
+      const secondDigit = screen.getByRole('textbox', { name: 'Digit 2 of 6' });
+      await userEvent.click(secondDigit);
+
+      // When pasting the digit
+      await userEvent.paste('2');
+
+      // Then it should have only one digit
+      expect(secondDigit).toHaveValue('2');
+
+      // When clicking on third digit field
+      const thirdDigit = screen.getByRole('textbox', { name: 'Digit 3 of 6' });
+      await userEvent.click(thirdDigit);
+
+      // When pasting the digit
+      await userEvent.paste('3');
+
+      // Then it should have only one digit
+      expect(thirdDigit).toHaveValue('3');
+    });
+
+    it('should fill the digits when focus first digit field and paste exactly 6 digits', async () => {
+      // Given a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // And clicking on first digit field
+      const firstDigit = screen.getByRole('textbox', { name: 'Digit 1 of 6' });
+      await userEvent.click(firstDigit);
+
+      // When pasting the digit
+      await userEvent.paste('123456');
+
+      // Then each digit should be filled
+      expect(screen.getByRole('textbox', { name: 'Digit 1 of 6' })).toHaveValue(
+        '1'
+      );
+      expect(screen.getByRole('textbox', { name: 'Digit 2 of 6' })).toHaveValue(
+        '2'
+      );
+      expect(screen.getByRole('textbox', { name: 'Digit 3 of 6' })).toHaveValue(
+        '3'
+      );
+      expect(screen.getByRole('textbox', { name: 'Digit 4 of 6' })).toHaveValue(
+        '4'
+      );
+      expect(screen.getByRole('textbox', { name: 'Digit 5 of 6' })).toHaveValue(
+        '5'
+      );
+      expect(screen.getByRole('textbox', { name: 'Digit 6 of 6' })).toHaveValue(
+        '6'
+      );
+
+      // And the last digit should be focused
+      const lastDigit = screen.getByRole('textbox', { name: 'Digit 6 of 6' });
+      expect(lastDigit).toHaveFocus();
+    });
   });
 
   describe.skip('Security question fields', () => {});
