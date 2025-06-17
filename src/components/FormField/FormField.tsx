@@ -1,10 +1,12 @@
 import { Label, type LabelProps } from '../Label/Label';
 import {
   getFormFieldDescriptionId,
+  getFormFieldErrorMessageId,
   getFormFieldLabelId,
 } from './FormField.helpers';
 import {
   formFieldDescriptionClassName,
+  formFieldErrorMessageClassName,
   formFieldLabelClassName,
 } from './FormField.styles';
 
@@ -45,7 +47,14 @@ export const FormField: React.FC<FormFieldProps> = ({
         </p>
       ) : null}
       {children}
-      {error ? <p className="mt-2 text-sm text-red-600">{error}</p> : null}
+      {error ? (
+        <p
+          id={getFormFieldErrorMessageId(name)}
+          className={formFieldErrorMessageClassName}
+        >
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 };

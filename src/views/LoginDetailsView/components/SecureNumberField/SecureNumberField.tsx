@@ -3,7 +3,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { twMerge } from 'tailwind-merge';
 import {
   getFormFieldDescriptionId,
-  getFormFieldLabelId,
+  getFormFieldLabelId
 } from '../../../../components/FormField/FormField.helpers';
 import {
   formFieldDescriptionClassName,
@@ -174,7 +174,6 @@ export const SecureNumberField: React.FC = () => {
           />
         ))}
       </div>
-      {}
     </fieldset>
   );
 };

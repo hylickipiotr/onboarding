@@ -22,6 +22,7 @@ export const Input: React.FC<InputProps> = ({
       name={name}
       id={id ?? name}
       className={twMerge(inputClassName({ error }), className)}
+      aria-invalid={error ? 'true' : undefined}
       {...props}
     />
   );

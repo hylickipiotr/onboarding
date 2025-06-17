@@ -26,6 +26,7 @@ export const Select: React.FC<SelectProps> = ({
       className={twMerge(selectClassName({ error }), className)}
       value={value}
       defaultValue={value === undefined ? defaultValue ?? '' : undefined}
+      aria-invalid={error ? 'true' : undefined}
       {...props}
     >
       <option value="" disabled hidden>

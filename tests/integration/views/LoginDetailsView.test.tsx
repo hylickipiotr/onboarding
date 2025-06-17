@@ -587,9 +587,69 @@ describe('LoginDetailsView', () => {
       const lastDigit = screen.getByRole('textbox', { name: 'Digit 6 of 6' });
       expect(lastDigit).toHaveFocus();
     });
+
+    it('should mark the field as invalid when blurring the field and the field is empty', async () => {
+      // Given a rendered component
+      renderWithRouter(<LoginDetailsView />);
+
+      // When clicking on first digit field
+      const firstDigit = screen.getByRole('textbox', { name: 'Digit 1 of 6' });
+      await userEvent.click(firstDigit);
+
+      // And blurring the field
+      await userEvent.tab();
+
+      // Then it should be marked as invalid
+      expect(firstDigit).toHaveAttribute('aria-invalid', 'true');
+
+      // And second digit field should not be valid
+      const secondDigit = screen.getByRole('textbox', { name: 'Digit 2 of 6' });
+      expect(secondDigit).not.toHaveAttribute('aria-invalid', 'true');
+
+      // When entering the digit
+      await userEvent.type(firstDigit, '1');
+
+      // Then it should be marked as valid
+      expect(firstDigit).not.toHaveAttribute('aria-invalid', 'true');
+
+      // And second digit field should be focused
+      expect(secondDigit).toHaveFocus();
+
+      // And second digit should not be marked as invalid
+      expect(secondDigit).not.toHaveAttribute('aria-invalid', 'true');
+
+      // When entering the digit
+      await userEvent.type(secondDigit, '2');
+
+      // And backspacing the digit
+      await userEvent.type(secondDigit, '{backspace}');
+
+      // Then second digit should be still focused
+      expect(secondDigit).toHaveFocus();
+
+      // And second digit should be still valid
+      expect(secondDigit).not.toHaveAttribute('aria-invalid', 'true');
+
+      // When backspacing one more time
+      await userEvent.type(secondDigit, '{backspace}');
+
+      // Then second digit should be marked as invalid
+      expect(secondDigit).toHaveAttribute('aria-invalid', 'true');
+
+      // And third digit should not be valid
+      const thirdDigit = screen.getByRole('textbox', { name: 'Digit 3 of 6' });
+      expect(thirdDigit).not.toHaveAttribute('aria-invalid', 'true');
+
+      // And first digit should be focused
+      expect(firstDigit).toHaveFocus();
+    });
   });
 
-  describe.skip('Security question fields', () => {});
+  describe('Security question fields', () => {
+    it('should render 3 security questions', async () => {});
+
+    it('should display the validation messages correctly', async () => {});
+  });
 });
 
 const loginDetailsFactory = factory.Sync.makeFactory<LoginDetailsFormValues>({
