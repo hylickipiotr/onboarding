@@ -1,0 +1,1 @@
+export const SECURITY_QUESTIONS_COUNT = 3;
