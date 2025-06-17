@@ -19,7 +19,7 @@ export class OnboardingStack extends Cdk.Stack {
     });
 
     const bucket = new S3.Bucket(this, 'OnboardingBucket', {
-      bucketName: resourceNamingService.generate('bucket'),
+      bucketName: resourceNamingService.generate(`${this.account}-${this.region}`),
       autoDeleteObjects: true,
       publicReadAccess: true,
       blockPublicAccess: new S3.BlockPublicAccess({
