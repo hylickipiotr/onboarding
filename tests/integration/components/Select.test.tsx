@@ -98,11 +98,13 @@ describe('Select', () => {
 
     // And it should render the options
     const optionsElements = screen.getAllByRole('option');
-    expect(optionsElements).toHaveLength(2);
-    expect(optionsElements[0]).toHaveTextContent(options[0].label);
-    expect(optionsElements[0]).toHaveValue(options[0].value);
-    expect(optionsElements[1]).toHaveTextContent(options[1].label);
-    expect(optionsElements[1]).toHaveValue(options[1].value);
+    expect(optionsElements).toHaveLength(3);
+    expect(optionsElements[0]).toHaveTextContent(placeholder);
+    expect(optionsElements[0]).toHaveValue('');
+    expect(optionsElements[1]).toHaveTextContent(options[0].label);
+    expect(optionsElements[1]).toHaveValue(options[0].value);
+    expect(optionsElements[2]).toHaveTextContent(options[1].label);
+    expect(optionsElements[2]).toHaveValue(options[1].value);
   });
 
   it('should render with default value', () => {

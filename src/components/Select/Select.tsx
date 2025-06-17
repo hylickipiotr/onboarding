@@ -29,7 +29,7 @@ export const Select: React.FC<SelectProps> = ({
       aria-invalid={error ? 'true' : undefined}
       {...props}
     >
-      <option value="" disabled hidden>
+      <option value="" disabled>
         {placeholder}
       </option>
       {children}
