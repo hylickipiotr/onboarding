@@ -18,7 +18,7 @@ export class OnboardingStack extends Cdk.Stack {
       appName: 'onboarding',
     });
 
-    const bucket = new S3.Bucket(this, 'Bucket', {
+    const bucket = new S3.Bucket(this, 'OnboardingBucket', {
       bucketName: resourceNamingService.generate('bucket'),
       autoDeleteObjects: true,
       publicReadAccess: true,
@@ -33,7 +33,7 @@ export class OnboardingStack extends Cdk.Stack {
       websiteErrorDocument: 'index.html',
     });
 
-    const distribution = new CloudFront.Distribution(this, 'Distribution', {
+    const distribution = new CloudFront.Distribution(this, 'OnboardingDistribution', {
       defaultBehavior: {
         viewerProtocolPolicy: CloudFront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         origin: new CloudFrontOrigins.S3StaticWebsiteOrigin(bucket, {
@@ -42,7 +42,7 @@ export class OnboardingStack extends Cdk.Stack {
         cachePolicy: CloudFront.CachePolicy.CACHING_OPTIMIZED,
         originRequestPolicy: new CloudFront.OriginRequestPolicy(
           this,
-          'OriginRequestPolicy',
+          'OnboardingOriginRequestPolicy',
           {
             originRequestPolicyName: resourceNamingService.generate(
               'origin-request-policy'
@@ -61,7 +61,7 @@ export class OnboardingStack extends Cdk.Stack {
       defaultRootObject: 'index.html',
     });
 
-    new S3Deployment.BucketDeployment(this, 'BucketDeployment', {
+    new S3Deployment.BucketDeployment(this, 'OnboardingBucketDeployment', {
       sources: [
         S3Deployment.Source.asset(path.join(import.meta.dirname, '../dist')),
       ],
@@ -71,7 +71,7 @@ export class OnboardingStack extends Cdk.Stack {
       prune: true,
     });
 
-    new Cdk.CfnOutput(this, 'DistributionDomainName', {
+    new Cdk.CfnOutput(this, 'OnboardingDistributionDomainName', {
       value: `https://${distribution.domainName}`,
       description: 'CloudFront Distribution Domain Name',
       exportName: `domain-name`,
