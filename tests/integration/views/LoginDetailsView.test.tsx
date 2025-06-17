@@ -1,13 +1,12 @@
 import { faker } from '@faker-js/faker';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import * as factory from 'factory.ts';
-import type { LoginDetailsFormValues } from '../../../src/views/LoginDetailsView/components/FormContainer/FormContainer';
+import { SECURE_NUMBER_DIGITS_COUNT } from '../../../src/views/LoginDetailsView/components/SecureNumberField/SecureNumberField';
 import { LoginDetailsView } from '../../../src/views/LoginDetailsView/LoginDetailsView';
+import { loginDetailsFactory } from '../factories/loginDetailsFactory';
 import { assertAppContextValue } from '../utils/asserts';
 import { renderWithRouter } from '../utils/renderWithRouter';
 
-const SECURE_NUMBER_DIGITS_COUNT = 6;
 const SECURITY_QUESTIONS_COUNT = 3;
 
 describe('LoginDetailsView', () => {
@@ -65,7 +64,7 @@ describe('LoginDetailsView', () => {
       });
       expect(digitTextbox).toBeInTheDocument();
       expect(digitTextbox).toBeEnabled();
-      expect(digitTextbox).toHaveValue(loginDetails.securityNumbers[index]);
+      expect(digitTextbox).toHaveValue(loginDetails.securityNumber[index]);
     });
 
     // And it should render security question field
@@ -161,7 +160,7 @@ describe('LoginDetailsView', () => {
     assertAppContextValue('loginDetails.password', loginDetails.password);
     assertAppContextValue(
       'loginDetails.securityNumber',
-      loginDetails.securityNumbers.join('')
+      loginDetails.securityNumber
     );
     assertAppContextValue(
       'loginDetails.securityQuestions.0.question',
@@ -650,34 +649,4 @@ describe('LoginDetailsView', () => {
 
     it('should display the validation messages correctly', async () => {});
   });
-});
-
-const loginDetailsFactory = factory.Sync.makeFactory<LoginDetailsFormValues>({
-  password: factory.each(() =>
-    faker.string.alphanumeric({
-      length: faker.number.int({ min: 8, max: 100 }),
-      casing: 'mixed',
-    })
-  ),
-  securityNumbers: factory.each(() =>
-    Array.from({ length: SECURE_NUMBER_DIGITS_COUNT }).map(() =>
-      faker.string.numeric({
-        length: 1,
-      })
-    )
-  ),
-  securityQuestions: factory.each(() => [
-    {
-      question: 'maiden-name',
-      answer: faker.person.firstName(),
-    },
-    {
-      question: 'city-of-birth',
-      answer: faker.location.city(),
-    },
-    {
-      question: 'first-pet-name',
-      answer: faker.animal.dog(),
-    },
-  ]),
 });

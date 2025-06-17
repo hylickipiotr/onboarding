@@ -1,7 +1,7 @@
 import { Navigate, type RouteObject } from 'react-router';
 import { App } from './components/App/App';
-import { LoginDetailsConfirmationView } from './views/LoginDetailsConfirmationView/LoginDetailsConfirmationView';
 import { LoginDetailsViewGuard } from './views/LoginDetailsView/LoginDetailsView.guard';
+import { LoginDetailsConfirmationViewGuard } from './views/LoginDetailsConfirmationView/LoginDetailsConfirmationView.guard';
 
 export const routes = [
   {
@@ -17,7 +17,7 @@ export const routes = [
       },
       {
         path: '/login-details/confirmation',
-        element: <LoginDetailsConfirmationView />,
+        element: <LoginDetailsConfirmationViewGuard />,
       },
       {
         path: '*',

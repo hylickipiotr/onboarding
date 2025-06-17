@@ -7,10 +7,17 @@ const initialState = {
   loginDetails: null,
 } satisfies AppContextState;
 
-export const AppContextProvider: React.FC<React.PropsWithChildren> = ({
-  children,
-}) => {
-  const [state, dispatch] = useReducer(appContextReducer, initialState);
+type AppContextProviderProps = {
+  defaultState?: Partial<AppContextState>;
+};
+
+export const AppContextProvider: React.FC<
+  React.PropsWithChildren<AppContextProviderProps>
+> = ({ children, defaultState }) => {
+  const [state, dispatch] = useReducer(appContextReducer, {
+    ...initialState,
+    ...defaultState,
+  });
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>

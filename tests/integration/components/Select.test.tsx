@@ -139,7 +139,7 @@ describe('Select', () => {
 
     // When a component is rendered
     render(
-      <Select name={name} placeholder={placeholder} value={value}>
+      <Select name={name} placeholder={placeholder} value={value} onChange={vi.fn()}>
         <option value={value}>{value}</option>
       </Select>
     );

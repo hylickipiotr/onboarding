@@ -12,7 +12,7 @@ import {
 import { Input } from '../../../../components/Input/Input';
 import { type LoginDetailsFormValues } from '../FormContainer/FormContainer';
 
-const SECURE_NUMBER_DIGITS_COUNT = 6;
+export const SECURE_NUMBER_DIGITS_COUNT = 6;
 
 export const SecureNumberField: React.FC = () => {
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);

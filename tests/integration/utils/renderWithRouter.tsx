@@ -14,12 +14,14 @@ import {
   useLocation,
 } from 'react-router';
 import { AppContextProvider } from '../../../src/contexts/AppContext';
+import type { AppContextState } from '../../../src/contexts/AppContext/AppContext.types';
 import { AppContextTestingDashboard } from './AppContextTestingDashboard';
 
 type ReactWithRouterOptions = {
   dashboardPath?: string;
   initialEntries?: string[];
   initialIndex?: number;
+  appContext?: Partial<AppContextState>;
 };
 
 type History = {
@@ -33,6 +35,7 @@ export const renderWithRouter = (
     dashboardPath,
     initialEntries = ['/'],
     initialIndex = 0,
+    appContext,
   }: ReactWithRouterOptions = {}
 ) => {
   const LocationTracker: React.FC<{ ref: React.Ref<History> }> = ({
@@ -60,7 +63,7 @@ export const renderWithRouter = (
 
   const Wrapper = () => {
     return (
-      <AppContextProvider>
+      <AppContextProvider defaultState={appContext}>
         <LocationTracker ref={trackerRef} />
         <Outlet />
       </AppContextProvider>
