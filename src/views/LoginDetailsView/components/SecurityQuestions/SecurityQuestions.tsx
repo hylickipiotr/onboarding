@@ -7,11 +7,11 @@ import {
   formFieldDescriptionClassName,
   formFieldLabelClassName,
 } from '../../../../components/FormField/FormField.styles';
-import { SecurityQuestionField } from '../SecureQuestionField/SecurityQuestionField';
+import { SecurityQuestionField } from '../SecurityQuestionField/SecurityQuestionField';
 import { SecurityAnswerField } from '../SecurityAnswerField/SecurityAnswerField';
-import { SECURITY_QUESTIONS_COUNT } from './SecurityQuestionsField.config';
+import { SECURITY_QUESTIONS_COUNT } from './SecurityQuestions.config';
 
-export const SecurityQuestionsField: React.FC = () => {
+export const SecurityQuestions: React.FC = () => {
   return (
     <fieldset
       role="group"
@@ -32,9 +32,9 @@ export const SecurityQuestionsField: React.FC = () => {
       >
         We'll only ask you these if you forget your password.
       </p>
-      <ul>
+      <ul className="mt-4 space-y-5">
         {Array.from({ length: SECURITY_QUESTIONS_COUNT }).map((_, index) => (
-          <li key={index} className="mt-2">
+          <li key={index}>
             <SecurityQuestionField  index={index} />
             <SecurityAnswerField index={index} />
           </li>

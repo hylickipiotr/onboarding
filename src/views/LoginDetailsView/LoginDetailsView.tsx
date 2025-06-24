@@ -4,7 +4,7 @@ import type { LoginDetailsState } from '../../contexts/AppContext/LoginDetails/L
 import { FormContainer } from './components/FormContainer/FormContainer';
 import { PasswordField } from './components/PasswordField/PasswordField';
 import { SecureNumberField } from './components/SecureNumberField/SecureNumberField';
-import { SecurityQuestionsField } from './components/SecurityQuestionsField/SecurityQuestionsField';
+import { SecurityQuestions } from './components/SecurityQuestions/SecurityQuestions';
 
 type LoginDetailsViewProps = {
   loginDetails?: LoginDetailsState;
@@ -25,7 +25,7 @@ export const LoginDetailsView: React.FC<LoginDetailsViewProps> = ({
       </PageHeading>
       <PasswordField />
       <SecureNumberField />
-      <SecurityQuestionsField />
+      <SecurityQuestions />
       <Button type="submit" className="w-full mt-8">
         Continue
       </Button>

@@ -4,7 +4,7 @@ import { Input } from '../../../../components/Input/Input';
 import type { LoginDetailsFormValues } from '../FormContainer/FormContainer';
 import { PasswordRequirement } from './PasswordRequirement';
 
-const passwordChecks = [
+export const passwordChecks = [
   {
     label: 'At least 8 characters',
     validate: (value: string) => value.trim().length >= 8,

@@ -13,7 +13,7 @@ describe('Button', () => {
 
     // And it should have the default props
     expect(button).toHaveAttribute('type', 'button');
-    expect(button).toHaveClass('inline-flex ');
+    expect(button).toHaveClass('inline-flex');
   });
 
   it('should render with default and custom class', () => {

@@ -4,6 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 import { useLoginDetails } from '../../../../contexts/AppContext';
+import { passwordChecks } from '../PasswordField/PasswordField';
 
 type FormContainerProps = Omit<
   React.JSX.IntrinsicElements['form'],
@@ -16,20 +17,18 @@ const LoginDetailsFormSchema = z.object({
   password: z
     .string()
     .trim()
-    .min(8, {
-      message: 'At least 8 characters',
-    })
-    .refine((val) => /[a-z]/.test(val), {
-      message: '1 lowercase letter',
-    })
-    .refine((val) => /[A-Z]/.test(val), {
-      message: '1 uppercase letter',
-    })
-    .refine((val) => /[0-9]/.test(val), {
-      message: '1 number',
+    .superRefine((val, ctx) => {
+      for (const check of passwordChecks) {
+        if (!check.validate(val)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `${check.label} not met`,
+          });
+        }
+      }
     }),
   securityNumbers: z
-    .array(z.string().regex(/^[0-9a-zA-Z]$/, 'Invalid character'))
+    .array(z.string().regex(/^\d$/, 'Only numbers allowed'))
     .length(6, 'Security number must have 6 digits')
     .refine((arr) => arr.every((val) => val.length === 1), {
       message: 'Each field must be filled',

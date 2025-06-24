@@ -3,7 +3,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { LoginDetailsState } from '../../../src/contexts/AppContext/LoginDetails/LoginDetails.types';
 import { SECURE_NUMBER_DIGITS_COUNT } from '../../../src/views/LoginDetailsView/components/SecureNumberField/SecureNumberField';
-import { SECURITY_QUESTION_OPTIONS } from '../../../src/views/LoginDetailsView/components/SecureQuestionField/SecurityQuestionField.config';
+import { SECURITY_QUESTION_OPTIONS } from '../../../src/views/LoginDetailsView/components/SecurityQuestionField/SecurityQuestionField.config';
 import { LoginDetailsViewGuard } from '../../../src/views/LoginDetailsView/LoginDetailsView.guard';
 import { generatePassword, loginDetailsFactory } from '../factories/loginDetailsFactory';
 import { assertAppContextValue } from '../utils/asserts';
@@ -578,7 +578,7 @@ describe('LoginDetailsView', () => {
       const thirdDigit = screen.getByRole('textbox', { name: 'Digit 3 of 6' });
       await userEvent.click(thirdDigit);
 
-      // When pasting the digit
+      // And pasting the digit
       await userEvent.paste('3');
 
       // Then it should have only one digit
@@ -586,7 +586,10 @@ describe('LoginDetailsView', () => {
     });
 
     it('should fill the digits when focus first digit field and paste exactly 6 digits', async () => {
-      // Given a rendered component
+      // Given text to paste
+      const textToPaste = faker.string.numeric({ length: 6});
+
+      // And a rendered component
       renderWithRouter(<LoginDetailsViewGuard />);
 
       // And clicking on first digit field
@@ -594,27 +597,13 @@ describe('LoginDetailsView', () => {
       await userEvent.click(firstDigit);
 
       // When pasting the digit
-      await userEvent.paste('123456');
+      await userEvent.paste(textToPaste);
 
       // Then each digit should be filled
-      expect(screen.getByRole('textbox', { name: 'Digit 1 of 6' })).toHaveValue(
-        '1'
-      );
-      expect(screen.getByRole('textbox', { name: 'Digit 2 of 6' })).toHaveValue(
-        '2'
-      );
-      expect(screen.getByRole('textbox', { name: 'Digit 3 of 6' })).toHaveValue(
-        '3'
-      );
-      expect(screen.getByRole('textbox', { name: 'Digit 4 of 6' })).toHaveValue(
-        '4'
-      );
-      expect(screen.getByRole('textbox', { name: 'Digit 5 of 6' })).toHaveValue(
-        '5'
-      );
-      expect(screen.getByRole('textbox', { name: 'Digit 6 of 6' })).toHaveValue(
-        '6'
-      );
+      for (let index = 0; index < textToPaste.length; index += 1) {
+        const digit = screen.getByRole('textbox', { name: `Digit ${index + 1} of 6` });
+        expect(digit).toHaveValue(textToPaste[index]);
+      }
 
       // And the last digit should be focused
       const lastDigit = screen.getByRole('textbox', { name: 'Digit 6 of 6' });

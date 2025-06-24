@@ -129,4 +129,15 @@ describe('Input', () => {
     // And it should not call the handleChange function
     expect(handleChange).not.toHaveBeenCalled();
   });
+
+  it('should render with invalid aria attribute when is in error state', async () => {
+    // Given a name
+    const name = faker.lorem.word();
+
+    // When render a component with error
+    render(<Input name={name} error />);
+
+    // Then it should render with invalid aria attribute
+    expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
+  });
 });

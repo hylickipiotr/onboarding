@@ -141,7 +141,12 @@ describe('Select', () => {
 
     // When a component is rendered
     render(
-      <Select name={name} placeholder={placeholder} value={value} onChange={vi.fn()}>
+      <Select
+        name={name}
+        placeholder={placeholder}
+        value={value}
+        onChange={vi.fn()}
+      >
         <option value={value}>{value}</option>
       </Select>
     );
@@ -216,5 +221,19 @@ describe('Select', () => {
 
     // And it should not call the handleChange function
     expect(handleChange).not.toHaveBeenCalled();
+  });
+
+  it('should render invalid aria attribute when is in error state', async () => {
+    // Given a name
+    const name = faker.lorem.word();
+
+    // When render a component with error
+    render(<Select name={name} placeholder='select something' error />);
+
+    // Then it should render with invalid aria attribute
+    expect(screen.getByRole('combobox')).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
   });
 });
