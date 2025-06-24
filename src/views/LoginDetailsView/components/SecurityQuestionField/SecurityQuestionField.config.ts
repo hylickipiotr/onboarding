@@ -2,7 +2,7 @@ import type { Option } from "./SecurityQuestionField.types";
 
 export const SECURITY_QUESTION_OPTIONS = [
   {
-    value: 'maiden-name',
+    value: 'mother-maiden-name',
     label: "What is your mother's maiden name?",
   },
   {
