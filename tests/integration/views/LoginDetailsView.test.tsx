@@ -719,7 +719,7 @@ describe('LoginDetailsView', () => {
 
       // When selecting a question
       const optionsToSelect = [
-        'maiden-name',
+        'mother-maiden-name',
         'city-of-birth',
         'first-pet-name',
       ] as const;

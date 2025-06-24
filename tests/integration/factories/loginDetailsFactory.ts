@@ -28,7 +28,7 @@ export const loginDetailsFactory = factory.Sync.makeFactory<LoginDetailsState>({
   ),
   securityQuestions: factory.each(() => [
     {
-      question: 'maiden-name',
+      question: 'mother-maiden-name',
       answer: faker.person.firstName(),
     },
     {
