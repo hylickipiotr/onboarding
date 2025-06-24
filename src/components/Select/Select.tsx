@@ -1,4 +1,4 @@
-import { IconChevronDown, IconSelector } from '@tabler/icons-react';
+import { IconSelector } from '@tabler/icons-react';
 import type { VariantProps } from 'class-variance-authority';
 import { twMerge } from 'tailwind-merge';
 import { selectBaseClassName, selectClassName } from './Select.styles';

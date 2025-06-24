@@ -74,7 +74,11 @@ export const FormContainer: React.FC<
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} {...props}>
+      <form
+        className="px-4 pt-6 pb-8"
+        onSubmit={form.handleSubmit(onSubmit)}
+        {...props}
+      >
         {children}
       </form>
     </FormProvider>

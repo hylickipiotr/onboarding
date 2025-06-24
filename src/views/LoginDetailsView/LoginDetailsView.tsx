@@ -15,7 +15,6 @@ export const LoginDetailsView: React.FC<LoginDetailsViewProps> = ({
 }) => {
   return (
     <FormContainer
-      className="px-4 pt-6 pb-8"
       defaultValues={mapLoginDetailsToFormValues(loginDetails)}
     >
       <PageHeading title="Create your login details">
